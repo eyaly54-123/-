@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioPro Ultra | הלינק החדש שלך</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200;400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #6366f1; }
+        body { font-family: 'Assistant', sans-serif; background: #020617; color: white; overflow-x: hidden; margin: 0; }
+        
+        /* אפקטים של זכוכית ויוקרה */
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        
+        /* שלדת טלפון פרימיום */
+        .phone-frame {
+            width: 340px; height: 680px; border: 12px solid #0f172a; border-radius: 50px;
+            position: relative; background: #000; box-shadow: 0 0 100px -20px var(--primary);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .notch { width: 120px; height: 25px; background: #0f172a; position: absolute; top: 0; left: 50%; transform: translateX(-50%); border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; z-index: 30; }
+
+        /* אנימציות כפתורים */
+        .btn-link { 
+            opacity: 0; transform: translateY(15px); 
+            animation: slideIn 0.4s ease forwards;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
+        .btn-link:hover { transform: scale(1.05); filter: brightness(1.3); cursor: pointer; }
+
+        /* הילה זזה */
+        #cursorGlow {
+            position: fixed; width: 600px; height: 600px; background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none; z-index: -1; transform: translate(-50%, -50%);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="cursorGlow"></div>
+
+    <div id="authContainer" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-6 transition-all duration-700">
+        <div class="glass p-10 rounded-[3rem] w-full max-w-md text-center space-y-8">
+            <div>
+                <h1 class="text-5xl font-black tracking-tighter text-white mb-2">Bio<span class="text-indigo-500">Pro.</span></h1>
+                <p class="text-slate-400 font-light">בנה כרטיס ביקור טוב יותר מלינקטרי - בחינם.</p>
+            </div>
+            <div class="space-y-4">
+                <input type="text" id="userInput" placeholder="בחר שם משתמש" class="w-full bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all text-center text-xl font-bold">
+                <button onclick="startApp()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-5 rounded-2xl font-black text-xl shadow-2xl shadow-indigo-500/20 transition-all transform active:scale-95">צור את הלינק שלי</button>
+            </div>
+        </div>
+    </div>
+
+    <main id="mainApp" class="opacity-0 transition-opacity duration-1000 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 p-6 lg:p-12">
+        
+        <div class="lg:col-span-7 space-y-8">
+            <header class="flex justify-between items-center">
+                <h2 class="text-3xl font-black">עורך הכרטיס <span id="userNameDisplay" class="text-indigo-500 text-lg font-light block"></span></h2>
+                <button onclick="location.reload()" class="text-xs text-slate-500 hover:text-white border border-slate-800 px-4 py-2 rounded-xl transition">התנתק</button>
+            </header>
+
+            <div class="glass rounded-[2.5rem] p-8 space-y-10">
+                <section class="space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500">זהות המותג</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="nameIn" oninput="updatePreview()" placeholder="השם שלך (למשל: דניאל כהן)" class="bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-indigo-500 transition">
+                        <input type="text" id="imgIn" oninput="updatePreview()" placeholder="לינק לתמונה (URL)" class="bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <textarea id="bioIn" oninput="updatePreview()" placeholder="ספר בקצרה מה אתה עושה..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-indigo-500 transition"></textarea>
+                </section>
+
+                <section class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500">קישורים (Instagram, TikTok וכו')</h3>
+                        <button onclick="addLinkRow()" class="text-indigo-400 text-sm font-bold hover:text-indigo-300">+ הוסף עוד</button>
+                    </div>
+                    <div id="linksList" class="space-y-3">
+                        <div class="flex gap-3 bg-white/5 p-3 rounded-2xl border border-white/5">
+                            <input type="text" placeholder="שם הקישור" class="label-in w-1/3 bg-transparent outline-none font-bold">
+                            <input type="text" placeholder="URL" class="url-in w-2/3 bg-transparent outline-none text-indigo-400" oninput="updatePreview()">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="space-y-4">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500">סגנון עיצובי</h3>
+                    <div class="grid grid-cols-4 gap-4">
+                        <button onclick="changeTheme('modern')" class="h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 border border-white/20"></button>
+                        <button onclick="changeTheme('cyber')" class="h-12 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 border border-white/20"></button>
+                        <button onclick="changeTheme('gold')" class="h-12 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-600 border border-white/20"></button>
+                        <button onclick="changeTheme('minimal')" class="h-12 rounded-xl bg-slate-800 border border-white/10"></button>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div class="lg:col-span-5 flex justify-center">
+            <div class="sticky top-12">
+                <div class="phone-frame" id="phoneBox">
+                    <div class="notch"></div>
+                    <div id="phoneContent" class="h-full p-8 flex flex-col items-center overflow-y-auto no-scrollbar transition-all duration-500" style="background: linear-gradient(180deg, #0f172a 0%, #000 100%);">
+                        
+                        <div id="prevImg" class="w-24 h-24 rounded-[2.5rem] bg-cover bg-center shadow-2xl border-4 border-white/10 mt-12 transition-all duration-500" style="background-image: url('https://ui-avatars.com/api/?background=333&color=fff&name=?');"></div>
+
+                        <h3 id="prevName" class="text-2xl font-extrabold mt-6 text-center">השם שלך</h3>
+                        <p id="prevBio" class="text-slate-400 text-sm mt-2 text-center px-4 leading-relaxed font-light">איך יראה הכרטיס שלך? מלא את הפרטים.</p>
+
+                        <div id="prevLinks" class="w-full mt-10 space-y-4">
+                            </div>
+
+                        <div class="mt-auto pt-10 opacity-30 text-[10px] tracking-widest uppercase">
+                            Premium by BioPro
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // תנועת ההילה
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('cursorGlow');
+            glow.style.left = e.clientX + 'px';
+            glow.style.top = e.clientY + 'px';
+        });
+
+        function startApp() {
+            const user = document.getElementById('userInput').value;
+            if(!user) return alert("נא לבחור שם משתמש");
+            
+            document.getElementById('userNameDisplay').innerText = "@" + user;
+            document.getElementById('authContainer').style.opacity = '0';
+            document.getElementById('authContainer').style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                document.getElementById('mainApp').classList.remove('opacity-0');
+            }, 500);
+        }
+
+        function addLinkRow() {
+            const container = document.getElementById('linksList');
+            const div = document.createElement('div');
+            div.className = 'flex gap-3 bg-white/5 p-3 rounded-2xl border border-white/5';
+            div.innerHTML = `
+                <input type="text" placeholder="שם" class="label-in w-1/3 bg-transparent outline-none font-bold">
+                <input type="text" placeholder="URL" class="url-in w-2/3 bg-transparent outline-none text-indigo-400" oninput="updatePreview()">
+            `;
+            container.appendChild(div);
+        }
+
+        const themes = {
+            modern: { bg: 'linear-gradient(180deg, #1e1b4b 0%, #000 100%)', btn: 'bg-white/10 shadow-indigo-500/10', color: 'white' },
+            cyber: { bg: 'linear-gradient(180deg, #083344 0%, #000 100%)', btn: 'bg-cyan-500/20 border-cyan-500/50', color: '#22d3ee' },
+            gold: { bg: 'linear-gradient(180deg, #451a03 0%, #000 100%)', btn: 'bg-gradient-to-r from-yellow-600 to-orange-600', color: 'white' },
+            minimal: { bg: '#050505', btn: 'border border-white/10 bg-white/5', color: 'white' }
+        };
+
+        let activeTheme = 'modern';
+
+        function changeTheme(t) {
+            activeTheme = t;
+            const phone = document.getElementById('phoneContent');
+            phone.style.background = themes[t].bg;
+            updatePreview();
+        }
+
+        function updatePreview() {
+            document.getElementById('prevName').innerText = document.getElementById('nameIn').value || "השם שלך";
+            document.getElementById('prevBio').innerText = document.getElementById('bioIn').value || "הביוגרפיה שלך תראה כאן מדהים...";
+            
+            const img = document.getElementById('imgIn').value;
+            if(img) document.getElementById('prevImg').style.backgroundImage = `url('${img}')`;
+
+            const labels = document.querySelectorAll('.label-in');
+            const container = document.getElementById('prevLinks');
+            container.innerHTML = '';
+
+            labels.forEach((l, i) => {
+                if(l.value) {
+                    const btn = document.createElement('div');
+                    btn.className = `btn-link w-full py-4 px-6 rounded-2xl font-bold text-center text-sm shadow-xl ${themes[activeTheme].btn}`;
+                    btn.style.color = themes[activeTheme].color;
+                    btn.style.animationDelay = (i * 0.1) + 's';
+                    btn.innerText = l.value;
+                    container.appendChild(btn);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
