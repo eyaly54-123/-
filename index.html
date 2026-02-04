@@ -125,6 +125,38 @@
         </div>
     </div>
 
+<button onclick="toggleShareMenu()" class="fixed bottom-6 right-6 w-14 h-14 bg-indigo-600 rounded-full shadow-2xl flex items-center justify-center text-white z-[100] hover:scale-110 transition">
+    <i class="fa-solid fa-share-nodes text-xl"></i>
+</button>
+
+<div id="shareModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[101] hidden flex items-end justify-center">
+    <div class="bg-[#111] w-full max-w-md rounded-t-[2rem] p-8 space-y-6 animate-in slide-in-from-bottom">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold">שתף פרופיל</h3>
+            <button onclick="toggleShareMenu()" class="text-slate-400"><i class="fa-solid fa-xmark text-2xl"></i></button>
+        </div>
+        
+        <div class="grid grid-cols-4 gap-4 text-center">
+            <button onclick="shareTo('whatsapp')" class="space-y-2">
+                <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto"><i class="fa-brands fa-whatsapp text-2xl"></i></div>
+                <span class="text-[10px]">WhatsApp</span>
+            </button>
+            <button onclick="shareTo('facebook')" class="space-y-2">
+                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto"><i class="fa-brands fa-facebook text-2xl"></i></div>
+                <span class="text-[10px]">Facebook</span>
+            </button>
+            <button onclick="copyPublicLink()" class="space-y-2">
+                <div class="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center mx-auto"><i class="fa-solid fa-link text-xl"></i></div>
+                <span class="text-[10px]">העתק לינק</span>
+            </button>
+            <button onclick="window.print()" class="space-y-2">
+                <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center mx-auto"><i class="fa-solid fa-qrcode text-xl"></i></div>
+                <span class="text-[10px]">QR Code</span>
+            </button>
+        </div>
+    </div>
+</div>
+    
     <script>
         // --- Firebase Config ---
         const firebaseConfig = {
@@ -271,6 +303,27 @@
                 container.appendChild(a);
             });
         }
+        function trackClick(linkIndex) {
+    const userRef = db.collection("users").doc(currentUid);
+    userData.links[linkIndex].clicks = (userData.links[linkIndex].clicks || 0) + 1;
+    userRef.update({ links: userData.links });
+}ֿ
+
+        function toggleShareMenu() {
+    const modal = document.getElementById('shareModal');
+    modal.classList.toggle('hidden');
+}
+
+function shareTo(platform) {
+    const url = window.location.href;
+    const text = "היי, תראו את הפרופיל החדש שלי ב-BioPro!";
+    
+    let shareUrl = '';
+    if (platform === 'whatsapp') shareUrl = `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`;
+    if (platform === 'facebook') shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    
+    window.open(shareUrl, '_blank');
+}
 
         function copyPublicLink() {
             const publicUrl = window.location.href.split('?')[0] + "?u=" + auth.currentUser.uid;
