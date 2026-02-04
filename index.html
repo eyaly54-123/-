@@ -10,61 +10,61 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
         body { background-color: #030712; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
         
-        /* עיצוב הטלפון עם ה-Notch */
+        /* עיצוב הטלפון */
         .phone-container { 
             width: 320px; height: 650px; border: 12px solid #1f2937; border-radius: 48px; 
             position: relative; overflow: hidden; background: #000; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
         }
         .notch {
             position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: 150px; height: 25px; background: #1f2937; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; z-index: 50;
+            width: 140px; height: 25px; background: #1f2937; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; z-index: 50;
         }
 
-        .link-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); animation: fadeInUp 0.5s ease forwards; }
+        .link-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .link-card:hover { transform: translateY(-3px) scale(1.02); filter: brightness(1.1); }
         
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
 
         /* Themes */
-        .theme-classic { background: #050505; }
-        .theme-ocean { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); }
-        .theme-sunset { background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%); }
-        .theme-minimal { background: #f3f4f6; color: #111; }
+        .theme-classic { background: #050505; color: white; }
+        .theme-ocean { background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%); color: white; }
+        .theme-sunset { background: linear-gradient(135deg, #4c1d95 0%, #db2777 100%); color: white; }
+        .theme-minimal { background: #ffffff; color: #111; }
+        .theme-minimal .link-card { background: #f3f4f6; color: #111; border: 1px solid #e5e7eb; }
     </style>
 </head>
 <body class="antialiased">
 
     <div id="loginScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#030712]">
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px]"></div>
-        </div>
-        <div class="relative glass p-10 rounded-[3rem] w-full max-w-md text-center space-y-8">
+        <div class="relative glass p-10 rounded-[3rem] w-full max-w-md text-center space-y-8 mx-4">
             <div class="bg-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto rotate-3 shadow-2xl">
-                <i class="fa-solid fa-bolt text-3xl"></i>
+                <i class="fa-solid fa-bolt text-3xl text-white"></i>
             </div>
-            <h1 class="text-4xl font-black">BioPro <span class="text-indigo-500">Cloud</span></h1>
-            <input type="email" id="email" placeholder="אימייל" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 text-center">
-            <input type="password" id="pass" placeholder="סיסמה" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 text-center">
-            <button onclick="authAction('email')" class="w-full p-4 bg-indigo-600 rounded-2xl font-bold hover:bg-indigo-500 transition shadow-lg">כניסה למערכת</button>
+            <h1 class="text-4xl font-black">BioPro <span class="text-indigo-500 text-white">Cloud</span></h1>
+            <div class="space-y-4">
+                <input type="email" id="email" placeholder="אימייל" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 text-center">
+                <input type="password" id="pass" placeholder="סיסמה" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 text-center">
+                <button onclick="authAction()" class="w-full p-4 bg-indigo-600 rounded-2xl font-bold hover:bg-indigo-500 transition shadow-lg text-white">כניסה / הרשמה</button>
+            </div>
         </div>
     </div>
 
     <div id="adminPanel" class="hidden min-h-screen">
         <nav class="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <span class="bg-indigo-600 px-3 py-1 rounded-md text-xs font-black italic">PRO</span>
-                <span id="userNameDisplay" class="text-sm font-bold opacity-70">טוען...</span>
+                <span class="bg-indigo-600 px-3 py-1 rounded-md text-xs font-black italic text-white">PRO</span>
+                <span id="userNameDisplay" class="text-sm font-bold opacity-70">משתמש</span>
             </div>
             <div class="flex gap-4">
-                <button onclick="toggleShareMenu()" class="text-xs font-bold bg-indigo-600 px-4 py-2 rounded-full hover:bg-indigo-500 transition">
-                    <i class="fa-solid fa-share-nodes ml-2"></i> שתף פרופיל
+                <button onclick="toggleShareMenu()" class="text-xs font-bold bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-500 transition">
+                    <i class="fa-solid fa-share-nodes ml-2"></i> שיתוף
                 </button>
                 <button onclick="firebase.auth().signOut()" class="text-slate-500 hover:text-red-400 transition"><i class="fa-solid fa-power-off"></i></button>
             </div>
@@ -73,25 +73,28 @@
         <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 p-6">
             <div class="lg:col-span-7 space-y-6">
                 <div class="glass p-8 rounded-[2.5rem] space-y-6">
-                    <h3 class="text-xl font-bold text-indigo-400 flex items-center gap-3"><i class="fa-solid fa-palette"></i> עיצוב ופרופיל</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <input type="text" id="nameIn" oninput="autoSave()" placeholder="שם מלא" class="bg-black/40 p-4 rounded-xl border border-white/5 outline-none">
-                        <input type="text" id="phoneIn" oninput="autoSave()" placeholder="טלפון (לשמירת איש קשר)" class="bg-black/40 p-4 rounded-xl border border-white/5 outline-none">
+                    <h3 class="text-xl font-bold text-indigo-400 flex items-center gap-3"><i class="fa-solid fa-user-gear"></i> הגדרות פרופיל</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="nameIn" oninput="autoSave()" placeholder="שם מלא" class="bg-black/40 p-4 rounded-xl border border-white/5 outline-none text-white">
+                        <input type="text" id="phoneIn" oninput="autoSave()" placeholder="טלפון (לשמירת איש קשר)" class="bg-black/40 p-4 rounded-xl border border-white/5 outline-none text-white">
                     </div>
-                    <input type="text" id="imgIn" oninput="autoSave()" placeholder="תמונה URL" class="w-full bg-black/40 p-4 rounded-xl border border-white/5 outline-none">
+                    <input type="text" id="imgIn" oninput="autoSave()" placeholder="תמונה URL" class="w-full bg-black/40 p-4 rounded-xl border border-white/5 outline-none text-white">
                     
-                    <div class="flex gap-4 overflow-x-auto py-2">
-                        <button onclick="setTheme('theme-classic')" class="w-10 h-10 rounded-full border-2 border-white theme-classic"></button>
-                        <button onclick="setTheme('theme-ocean')" class="w-10 h-10 rounded-full border-2 border-white/20 theme-ocean"></button>
-                        <button onclick="setTheme('theme-sunset')" class="w-10 h-10 rounded-full border-2 border-white/20 theme-sunset"></button>
-                        <button onclick="setTheme('theme-minimal')" class="w-10 h-10 rounded-full border-2 border-white/20 theme-minimal"></button>
+                    <div class="space-y-3">
+                        <label class="text-xs font-bold opacity-50">בחר ערכת נושא:</label>
+                        <div class="flex gap-4">
+                            <button onclick="setTheme('theme-classic')" class="w-10 h-10 rounded-full border-2 border-white theme-classic shadow-lg"></button>
+                            <button onclick="setTheme('theme-ocean')" class="w-10 h-10 rounded-full border-2 border-white/10 theme-ocean shadow-lg"></button>
+                            <button onclick="setTheme('theme-sunset')" class="w-10 h-10 rounded-full border-2 border-white/10 theme-sunset shadow-lg"></button>
+                            <button onclick="setTheme('theme-minimal')" class="w-10 h-10 rounded-full border-2 border-white/10 theme-minimal shadow-lg"></button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="glass p-8 rounded-[2.5rem] space-y-6">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-xl font-bold text-indigo-400">הקישורים שלך</h3>
-                        <button onclick="addNewLink()" class="bg-indigo-600/20 text-indigo-400 text-xs px-4 py-2 rounded-full font-bold hover:bg-indigo-600/30">+ הוסף</button>
+                        <h3 class="text-xl font-bold text-indigo-400">קישורים ורשתות</h3>
+                        <button onclick="addNewLink()" class="bg-indigo-600/20 text-indigo-400 text-xs px-4 py-2 rounded-full font-bold hover:bg-indigo-600/30">+ הוסף קישור</button>
                     </div>
                     <div id="linksEditor" class="space-y-4"></div>
                 </div>
@@ -101,45 +104,46 @@
                 <div class="sticky top-28 flex flex-col items-center">
                     <div class="phone-container">
                         <div class="notch"></div>
-                        <div id="previewScreen" class="h-full theme-classic overflow-y-auto no-scrollbar pt-14 px-6 pb-10 flex flex-col items-center text-inherit">
-                            <img id="pImg" src="https://ui-avatars.com/api/?name=User" class="w-24 h-24 rounded-full border-4 border-white/10 shadow-2xl">
+                        <div id="previewScreen" class="h-full theme-classic overflow-y-auto no-scrollbar pt-14 px-6 pb-10 flex flex-col items-center">
+                            <img id="pImg" src="https://ui-avatars.com/api/?name=User" class="w-24 h-24 rounded-full border-4 border-white/10 shadow-2xl object-cover">
                             <h2 id="pName" class="mt-6 text-2xl font-black">השם שלך</h2>
                             
-                            <button onclick="downloadVCard()" class="mt-4 bg-white/10 px-4 py-2 rounded-full text-xs font-bold border border-white/10 hover:bg-white/20 transition">
+                            <button onclick="downloadVCard()" class="mt-4 bg-white/10 px-4 py-2 rounded-full text-[10px] font-bold border border-white/10 hover:bg-white/20 transition">
                                 <i class="fa-solid fa-address-book ml-2"></i> שמור איש קשר
                             </button>
 
                             <div id="pLinks" class="w-full mt-8 space-y-4"></div>
                         </div>
                     </div>
-                    <div id="saveStatus" class="mt-4 text-xs text-slate-500 font-mono">כל השינויים מסונכרנים</div>
+                    <div id="saveStatus" class="mt-4 text-xs text-slate-500 font-mono italic">כל השינויים מסונכרנים לענן</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="shareModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[101] hidden flex items-end justify-center">
-        <div class="bg-[#111] w-full max-w-md rounded-t-[2.5rem] p-8 space-y-8 animate-in slide-in-from-bottom duration-300">
-            <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-black">שתף את ה-Bio שלך</h3>
-                <button onclick="toggleShareMenu()"><i class="fa-solid fa-xmark text-2xl opacity-50"></i></button>
+    <div id="shareModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[101] hidden flex items-center justify-center p-4">
+        <div class="bg-[#111] w-full max-w-md rounded-[2.5rem] p-8 space-y-8 animate-in zoom-in duration-300 relative">
+            <button onclick="toggleShareMenu()" class="absolute top-6 left-6 text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div class="text-center space-y-2">
+                <h3 class="text-2xl font-black text-white">שתף את הכרטיס שלך</h3>
+                <p class="text-sm text-slate-400">הדרך המהירה ביותר להתחבר אליך</p>
             </div>
-            <div class="grid grid-cols-4 gap-4">
+
+            <div id="qrcode" class="bg-white p-4 rounded-2xl mx-auto w-fit shadow-2xl border-4 border-indigo-600"></div>
+
+            <div class="grid grid-cols-3 gap-4">
                 <button onclick="shareTo('whatsapp')" class="flex flex-col items-center gap-2">
-                    <div class="w-14 h-14 bg-green-500 rounded-2xl flex items-center justify-center text-2xl"><i class="fa-brands fa-whatsapp"></i></div>
-                    <span class="text-[10px] font-bold">ווצאפ</span>
-                </button>
-                <button onclick="shareTo('facebook')" class="flex flex-col items-center gap-2">
-                    <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fa-brands fa-facebook-f"></i></div>
-                    <span class="text-[10px] font-bold">פייסבוק</span>
+                    <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center text-xl text-white"><i class="fa-brands fa-whatsapp"></i></div>
+                    <span class="text-[10px] font-bold">WhatsApp</span>
                 </button>
                 <button onclick="copyPublicLink()" class="flex flex-col items-center gap-2">
-                    <div class="w-14 h-14 bg-slate-700 rounded-2xl flex items-center justify-center text-2xl"><i class="fa-solid fa-link"></i></div>
+                    <div class="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center text-xl text-white"><i class="fa-solid fa-link"></i></div>
                     <span class="text-[10px] font-bold">העתק לינק</span>
                 </button>
-                <button onclick="window.print()" class="flex flex-col items-center gap-2">
-                    <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fa-solid fa-qrcode"></i></div>
-                    <span class="text-[10px] font-bold">QR</span>
+                <button onclick="shareTo('facebook')" class="flex flex-col items-center gap-2">
+                    <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-xl text-white"><i class="fa-brands fa-facebook-f"></i></div>
+                    <span class="text-[10px] font-bold">Facebook</span>
                 </button>
             </div>
         </div>
@@ -162,8 +166,9 @@
 
         let userData = { name: "", phone: "", img: "", theme: "theme-classic", links: [] };
         let saveTimeout;
+        let qrInstance = null;
 
-        // --- Auth & Data ---
+        // --- Auth ---
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('loginScreen').classList.add('hidden');
@@ -176,9 +181,10 @@
             }
         });
 
-        function authAction(type) {
+        function authAction() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('pass').value;
+            if(!email || !pass) return alert("נא למלא אימייל וסיסמה");
             auth.signInWithEmailAndPassword(email, pass).catch(() => auth.createUserWithEmailAndPassword(email, pass));
         }
 
@@ -191,27 +197,29 @@
                 document.getElementById('imgIn').value = userData.img || "";
                 setTheme(userData.theme || 'theme-classic');
                 renderEditor();
-            } else { addNewLink(); }
+            } else {
+                addNewLink();
+            }
             renderPreview();
         }
 
-        // --- Editor & Themes ---
+        // --- Core Logic ---
         function renderEditor() {
             const container = document.getElementById('linksEditor');
             container.innerHTML = '';
             userData.links.forEach((link, index) => {
                 const div = document.createElement('div');
-                div.className = "glass p-4 rounded-2xl flex gap-3 items-center";
+                div.className = "glass p-4 rounded-2xl flex gap-3 items-center border border-white/5";
                 div.innerHTML = `
                     <div class="flex-1">
-                        <input type="text" value="${link.t}" placeholder="כותרת" oninput="updateLinkData(${index}, 't', this.value)" class="w-full bg-transparent outline-none font-bold text-sm">
-                        <input type="text" value="${link.u}" placeholder="קישור" oninput="updateLinkData(${index}, 'u', this.value)" class="w-full bg-transparent outline-none text-indigo-400 text-xs">
+                        <input type="text" value="${link.t}" placeholder="כותרת (למשל: אינסטגרם שלי)" oninput="updateLinkData(${index}, 't', this.value)" class="w-full bg-transparent outline-none font-bold text-sm text-white">
+                        <input type="text" value="${link.u}" placeholder="קישור (URL)" oninput="updateLinkData(${index}, 'u', this.value)" class="w-full bg-transparent outline-none text-indigo-400 text-xs">
                     </div>
-                    <div class="text-center px-3 border-x border-white/5">
-                        <div class="text-[10px] opacity-40 uppercase">קליקים</div>
+                    <div class="text-center px-4 border-r border-white/10">
+                        <div class="text-[9px] opacity-40 uppercase">קליקים</div>
                         <div class="font-black text-indigo-500">${link.clicks || 0}</div>
                     </div>
-                    <button onclick="removeLink(${index})" class="text-slate-600 hover:text-red-500 transition"><i class="fa-solid fa-trash"></i></button>
+                    <button onclick="removeLink(${index})" class="text-slate-600 hover:text-red-500 p-2"><i class="fa-solid fa-trash-can"></i></button>
                 `;
                 container.appendChild(div);
             });
@@ -224,8 +232,7 @@
 
         function setTheme(t) {
             userData.theme = t;
-            const screen = document.getElementById('previewScreen');
-            screen.className = `h-full overflow-y-auto no-scrollbar pt-14 px-6 pb-10 flex flex-col items-center ${t}`;
+            document.getElementById('previewScreen').className = `h-full overflow-y-auto no-scrollbar pt-14 px-6 pb-10 flex flex-col items-center ${t}`;
             autoSave();
         }
 
@@ -244,33 +251,40 @@
             }, 800);
         }
 
-        // --- Pro Features: vCard & Sharing ---
+        // --- Features ---
         function downloadVCard() {
-            const name = userData.name || "User";
-            const phone = userData.phone || "";
-            const vcfData = `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEND:VCARD`;
-            const blob = new Blob([vcfData], { type: 'text/vcard' });
-            const url = window.URL.createObjectURL(blob);
+            const vcf = `BEGIN:VCARD\nVERSION:3.0\nFN:${userData.name}\nTEL:${userData.phone}\nEND:VCARD`;
+            const blob = new Blob([vcf], { type: 'text/vcard' });
             const a = document.createElement('a');
-            a.href = url; a.download = `${name}.vcf`; a.click();
+            a.href = URL.createObjectURL(blob);
+            a.download = `${userData.name || 'contact'}.vcf`;
+            a.click();
         }
 
-        function toggleShareMenu() { document.getElementById('shareModal').classList.toggle('hidden'); }
+        function toggleShareMenu() {
+            const modal = document.getElementById('shareModal');
+            const url = window.location.origin + window.location.pathname + "?u=" + auth.currentUser.uid;
+            
+            modal.classList.toggle('hidden');
+            
+            if(!modal.classList.contains('hidden')) {
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), { text: url, width: 160, height: 160 });
+            }
+        }
 
         function copyPublicLink() {
             const url = window.location.origin + window.location.pathname + "?u=" + auth.currentUser.uid;
             navigator.clipboard.writeText(url);
-            alert("הלינק הועתק!");
+            alert("הלינק הועתק בהצלחה!");
         }
 
         function shareTo(p) {
             const url = window.location.origin + window.location.pathname + "?u=" + auth.currentUser.uid;
-            const text = encodeURIComponent("הנה הפרופיל החדש שלי: " + url);
-            if(p === 'whatsapp') window.open(`https://wa.me/?text=${text}`);
+            if(p === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(url)}`);
             if(p === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`);
         }
 
-        // --- Track & Render ---
         async function trackClick(uid, index) {
             const ref = db.collection("users").doc(uid);
             const doc = await ref.get();
@@ -282,14 +296,15 @@
         function renderPreview() {
             document.getElementById('pName').innerText = userData.name || "השם שלך";
             if(userData.img) document.getElementById('pImg').src = userData.img;
+            
             const container = document.getElementById('pLinks');
             container.innerHTML = '';
             userData.links.forEach((l, i) => {
                 if(!l.t) return;
                 const a = document.createElement('a');
                 a.href = l.u || "#"; a.target = "_blank";
-                a.className = "link-card flex items-center justify-between w-full p-4 rounded-2xl bg-white/10 font-bold border border-white/5 shadow-lg";
-                a.innerHTML = `<span>${l.t}</span><i class="fa-solid fa-chevron-left text-[10px] opacity-40"></i>`;
+                a.className = "link-card flex items-center justify-between w-full p-4 rounded-2xl bg-white/10 font-bold shadow-lg border border-white/5 text-inherit";
+                a.innerHTML = `<span class="text-sm">${l.t}</span><i class="fa-solid fa-chevron-left text-[10px] opacity-30"></i>`;
                 a.onclick = () => { if(window.location.search.includes('u=')) trackClick(new URLSearchParams(window.location.search).get('u'), i); };
                 container.appendChild(a);
             });
@@ -298,25 +313,29 @@
         function addNewLink() { userData.links.push({ t: "", u: "", clicks: 0 }); renderEditor(); }
         function removeLink(i) { userData.links.splice(i, 1); renderEditor(); autoSave(); }
 
-        // --- Public View Logic ---
+        // --- Public View ---
         window.onload = async () => {
             const params = new URLSearchParams(window.location.search);
             const uid = params.get('u');
             if (uid) {
                 const doc = await db.collection("users").doc(uid).get();
                 if(doc.exists) {
-                    userData = doc.data();
-                    document.body.innerHTML = `<div class="flex items-center justify-center min-h-screen bg-black">
-                        <div class="w-full max-w-md h-screen ${userData.theme} p-6 flex flex-col items-center">
-                            <img src="${userData.img}" class="w-28 h-28 rounded-full border-4 border-white/10 shadow-2xl mt-10">
-                            <h1 class="text-3xl font-black mt-6">${userData.name}</h1>
-                            <button onclick="downloadVCard()" class="mt-4 bg-white/10 px-6 py-2 rounded-full font-bold border border-white/10">שמור איש קשר</button>
-                            <div class="w-full mt-10 space-y-4">${userData.links.map((l, i) => `
-                                <a href="${l.u}" target="_blank" onclick="trackClick('${uid}', ${i})" class="flex items-center justify-between w-full p-5 rounded-2xl bg-white/10 font-bold shadow-lg border border-white/5">
-                                    <span>${l.t}</span><i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-30"></i>
-                                </a>`).join('')}</div>
-                        </div>
-                    </div>`;
+                    const data = doc.data();
+                    document.body.innerHTML = `
+                        <div class="flex items-center justify-center min-h-screen bg-black">
+                            <div class="w-full max-w-md h-screen ${data.theme || 'theme-classic'} p-8 flex flex-col items-center shadow-2xl overflow-y-auto">
+                                <img src="${data.img}" class="w-28 h-28 rounded-full border-4 border-white/10 shadow-2xl mt-12 object-cover">
+                                <h1 class="text-3xl font-black mt-6">${data.name}</h1>
+                                <button onclick="window.location.href='vcard'" class="mt-4 bg-white/10 px-6 py-2 rounded-full font-bold border border-white/10 text-xs">שמור איש קשר</button>
+                                <div class="w-full mt-10 space-y-4">
+                                    ${data.links.map((l, i) => `
+                                        <a href="${l.u}" target="_blank" onclick="trackClick('${uid}', ${i})" class="flex items-center justify-between w-full p-5 rounded-2xl bg-white/10 font-bold shadow-lg border border-white/5">
+                                            <span>${l.t}</span><i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-30"></i>
+                                        </a>`).join('')}
+                                </div>
+                                <div class="mt-auto py-10 opacity-20 text-[10px] uppercase tracking-widest font-bold">Created with BioPro Cloud</div>
+                            </div>
+                        </div>`;
                 }
             }
         };
