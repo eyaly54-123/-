@@ -254,8 +254,88 @@
         </div>
     </div>
 
-    <script>
-        // לוגיקה
+   <script>
+        // --- לוגיקה לשמירה וטעינה מה-URL ---
+        
+        // פונקציה שמקודדת את המידע לתוך ה-URL
+        function generateShareableLink() {
+            const data = {
+                u: document.getElementById('usernameInput').value || 'User',
+                n: document.getElementById('nameField').value,
+                b: document.getElementById('bioField').value,
+                i: document.getElementById('imgField').value,
+                t: currentTheme,
+                l: [] // Links array
+            };
+
+            document.querySelectorAll('.link-item').forEach(item => {
+                const title = item.querySelector('.link-title').value;
+                const url = item.querySelector('.link-url').value;
+                if (title && url) data.l.push({ t: title, u: url });
+            });
+
+            // המרה ל-Base64 כדי שהלינק יראה (יחסית) נקי
+            // שימוש ב-encodeURIComponent כדי לתמוך בעברית
+            const jsonString = JSON.stringify(data);
+            const encodedData = btoa(unescape(encodeURIComponent(jsonString)));
+            
+            const baseUrl = window.location.href.split('?')[0];
+            const finalUrl = `${baseUrl}?data=${encodedData}`;
+
+            // העתקה ללוח
+            navigator.clipboard.writeText(finalUrl).then(() => {
+                alert('הלינק הועתק! שלח אותו לחברים או פתח אותו בטאב חדש כדי לראות את התוצאה.');
+            });
+        }
+
+        // פונקציה שטוענת מידע מה-URL (אם קיים)
+        function loadFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const encodedData = params.get('data');
+
+            if (encodedData) {
+                try {
+                    // פענוח המידע
+                    const jsonString = decodeURIComponent(escape(atob(encodedData)));
+                    const data = JSON.parse(jsonString);
+
+                    // מצב צפייה בלבד (מסתיר את העורך)
+                    document.getElementById('authScreen').style.display = 'none';
+                    document.getElementById('appContainer').classList.remove('hidden');
+                    document.getElementById('appContainer').classList.remove('opacity-0');
+                    
+                    // הסתרת פאנל העריכה והשארת רק הטלפון (למי שפותח את הלינק)
+                    if(window.innerWidth < 1024) { 
+                        // במובייל - מראה רק את התוצאה
+                        document.querySelector('.lg\\:col-span-7').style.display = 'none';
+                        document.querySelector('.lg\\:col-span-5').classList.remove('lg:col-span-5');
+                        document.querySelector('.lg\\:col-span-5').classList.add('w-full');
+                    }
+
+                    // מילוי הנתונים
+                    document.getElementById('displayUsername').innerText = '@' + data.u;
+                    document.getElementById('nameField').value = data.n || '';
+                    document.getElementById('bioField').value = data.b || '';
+                    document.getElementById('imgField').value = data.i || '';
+                    
+                    // שחזור לינקים
+                    const linksContainer = document.getElementById('linksContainer');
+                    linksContainer.innerHTML = ''; // ניקוי
+                    data.l.forEach(link => {
+                        addLink(link.t, link.u);
+                    });
+
+                    setTheme(data.t || 'dark');
+                    render(); // רענון תצוגה
+
+                } catch (e) {
+                    console.error('Error parsing URL data', e);
+                }
+            }
+        }
+
+        // --- סוף לוגיקה חדשה ---
+
         let currentTheme = 'dark';
         const themes = {
             dark: { bg: '#0f172a', btn: 'bg-white/10 hover:bg-white/20 border-white/5', text: 'text-white' },
@@ -267,32 +347,31 @@
         function enterApp() {
             const user = document.getElementById('usernameInput').value;
             if(!user) return alert('נא להזין שם משתמש');
-            
             document.getElementById('displayUsername').innerText = '@' + user;
-            
             const auth = document.getElementById('authScreen');
             auth.style.opacity = '0';
             setTimeout(() => {
                 auth.style.display = 'none';
                 const app = document.getElementById('appContainer');
                 app.classList.remove('hidden');
-                // Timeout קצר כדי לאפשר הסרת ה-display: none לפני שינוי ה-opacity
                 setTimeout(() => app.classList.remove('opacity-0'), 50);
             }, 700);
         }
 
-        function addLink() {
+        // עדכון הפונקציה לקבלת פרמטרים
+        function addLink(titleVal = '', urlVal = '') {
             const container = document.getElementById('linksContainer');
             const div = document.createElement('div');
             div.className = 'link-item group flex gap-4 bg-[#020617] p-4 rounded-2xl border border-white/5 hover:border-indigo-500/30 transition-all animation-fade-in';
             div.innerHTML = `
                 <div class="flex flex-col gap-1 flex-1">
-                    <input type="text" class="link-title bg-transparent font-bold outline-none placeholder-slate-600" placeholder="כותרת" oninput="render()">
-                    <input type="text" class="link-url text-sm text-indigo-400 bg-transparent outline-none placeholder-indigo-900/50" placeholder="URL" oninput="render()">
+                    <input type="text" class="link-title bg-transparent font-bold outline-none placeholder-slate-600" value="${titleVal}" placeholder="כותרת" oninput="render()">
+                    <input type="text" class="link-url text-sm text-indigo-400 bg-transparent outline-none placeholder-indigo-900/50" value="${urlVal}" placeholder="URL" oninput="render()">
                 </div>
                 <button onclick="this.closest('.link-item').remove(); render()" class="text-slate-600 hover:text-red-400 transition"><i class="fa-solid fa-trash"></i></button>
             `;
             container.appendChild(div);
+            render();
         }
 
         function getIcon(url) {
@@ -305,11 +384,13 @@
             if(url.includes('youtube')) return '<i class="fa-brands fa-youtube text-xl"></i>';
             if(url.includes('github')) return '<i class="fa-brands fa-github text-xl"></i>';
             if(url.includes('whatsapp')) return '<i class="fa-brands fa-whatsapp text-xl"></i>';
+            if(url.includes('waze')) return '<i class="fa-brands fa-waze text-xl"></i>';
+            if(url.includes('mailto')) return '<i class="fa-solid fa-envelope text-xl"></i>';
+            if(url.includes('tel')) return '<i class="fa-solid fa-phone text-xl"></i>';
             return '<i class="fa-solid fa-link text-xl"></i>';
         }
 
         function render() {
-            // עדכון טקסטים
             const name = document.getElementById('nameField').value;
             const bio = document.getElementById('bioField').value;
             const img = document.getElementById('imgField').value;
@@ -318,7 +399,6 @@
             document.getElementById('prevBio').innerText = bio || "Bio description...";
             if(img) document.getElementById('prevImg').src = img;
 
-            // עדכון לינקים
             const linksDiv = document.getElementById('prevLinks');
             linksDiv.innerHTML = '';
             
@@ -332,6 +412,7 @@
                 if(title) {
                     const icon = getIcon(url || '');
                     const btn = document.createElement('a');
+                    // אם זה לינק רגיל, הוא יפתח בחלון חדש
                     btn.href = url || '#';
                     btn.target = "_blank";
                     btn.className = `flex items-center justify-between w-full p-4 rounded-xl border backdrop-blur-sm shadow-lg transition-all hover:scale-[1.02] active:scale-95 ${themeObj.btn} ${themeObj.text}`;
@@ -351,10 +432,15 @@
             currentTheme = themeName;
             const bgDiv = document.getElementById('phoneBg');
             bgDiv.style.background = themes[themeName].bg;
-            render(); // Rerender buttons with new styles
+            render();
         }
 
-        // QR Code Logic
+        // חיבור כפתור הפרסום לפונקציה החדשה
+        document.querySelector('.fa-share-nodes').closest('button').onclick = generateShareableLink;
+        
+        // טעינה ראשונית - בדיקה אם יש מידע ב-URL
+        window.addEventListener('load', loadFromURL);
+
         function generateQR() {
             const modal = document.getElementById('qrModal');
             modal.classList.remove('hidden');
