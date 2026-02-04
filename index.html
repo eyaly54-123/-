@@ -42,19 +42,35 @@
 </head>
 <body class="antialiased">
 
-    <div id="loginScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#030712]">
-        <div class="relative glass p-10 rounded-[3rem] w-full max-w-md text-center space-y-8 mx-4">
-            <div class="bg-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto rotate-3 shadow-2xl">
-                <i class="fa-solid fa-bolt text-3xl text-white"></i>
+<div id="loginScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#030712]">
+    <div class="relative glass p-10 rounded-[3rem] w-full max-w-md text-center space-y-8 mx-4 shadow-2xl">
+        <div class="bg-indigo-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto rotate-3">
+            <i class="fa-solid fa-bolt text-3xl text-white"></i>
+        </div>
+        <div>
+            <h1 class="text-4xl font-black">BioPro <span class="text-indigo-500">Cloud</span></h1>
+            <p class="text-slate-400 text-sm mt-2">ניהול נוכחות דיגיטלית מתקדם</p>
+        </div>
+
+        <div class="space-y-4">
+            <button onclick="authAction('google')" class="w-full flex items-center justify-center gap-3 p-4 bg-white text-black rounded-2xl font-bold hover:bg-slate-200 transition shadow-lg">
+                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-5 h-5">
+                המשך עם Google
+            </button>
+
+            <div class="flex items-center gap-4 py-2 opacity-20">
+                <hr class="flex-1 border-white"> <span class="text-xs">או</span> <hr class="flex-1 border-white">
             </div>
-            <h1 class="text-4xl font-black">BioPro <span class="text-indigo-500 text-white">Cloud</span></h1>
-            <div class="space-y-4">
-                <input type="email" id="email" placeholder="אימייל" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 text-center">
-                <input type="password" id="pass" placeholder="סיסמה" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 text-center">
-                <button onclick="authAction()" class="w-full p-4 bg-indigo-600 rounded-2xl font-bold hover:bg-indigo-500 transition shadow-lg text-white">כניסה / הרשמה</button>
-            </div>
+
+            <input type="email" id="email" placeholder="אימייל" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 text-center text-white">
+            <input type="password" id="pass" placeholder="סיסמה" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 text-center text-white">
+            
+            <button onclick="authAction('email')" class="w-full p-4 bg-indigo-600 rounded-2xl font-bold hover:bg-indigo-500 transition shadow-lg text-white">
+                כניסה / הרשמה במייל
+            </button>
         </div>
     </div>
+</div>
 
     <div id="adminPanel" class="hidden min-h-screen">
         <nav class="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
@@ -293,22 +309,16 @@
             await ref.update({ links: data.links });
         }
 
-        function renderPreview() {
-            document.getElementById('pName').innerText = userData.name || "השם שלך";
-            if(userData.img) document.getElementById('pImg').src = userData.img;
-            
-            const container = document.getElementById('pLinks');
-            container.innerHTML = '';
-            userData.links.forEach((l, i) => {
-                if(!l.t) return;
-                const a = document.createElement('a');
-                a.href = l.u || "#"; a.target = "_blank";
-                a.className = "link-card flex items-center justify-between w-full p-4 rounded-2xl bg-white/10 font-bold shadow-lg border border-white/5 text-inherit";
-                a.innerHTML = `<span class="text-sm">${l.t}</span><i class="fa-solid fa-chevron-left text-[10px] opacity-30"></i>`;
-                a.onclick = () => { if(window.location.search.includes('u=')) trackClick(new URLSearchParams(window.location.search).get('u'), i); };
-                container.appendChild(a);
-            });
-        }
+    function getSocialStyle(url) {
+    const lowUrl = url.toLowerCase();
+    if(lowUrl.includes('instagram')) return { icon: 'fa-brands fa-instagram', color: 'bg-[#E1306C]' };
+    if(lowUrl.includes('tiktok')) return { icon: 'fa-brands fa-tiktok', color: 'bg-black' };
+    if(lowUrl.includes('whatsapp') || lowUrl.includes('wa.me')) return { icon: 'fa-brands fa-whatsapp', color: 'bg-[#25D366]' };
+    if(lowUrl.includes('youtube')) return { icon: 'fa-brands fa-youtube', color: 'bg-[#FF0000]' };
+    if(lowUrl.includes('facebook')) return { icon: 'fa-brands fa-facebook-f', color: 'bg-[#1877F2]' };
+    if(lowUrl.includes('twitter') || lowUrl.includes('x.com')) return { icon: 'fa-brands fa-x-twitter', color: 'bg-black' };
+    return { icon: 'fa-solid fa-link', color: 'bg-indigo-600' }; // ברירת מחדל
+}
 
         function addNewLink() { userData.links.push({ t: "", u: "", clicks: 0 }); renderEditor(); }
         function removeLink(i) { userData.links.splice(i, 1); renderEditor(); autoSave(); }
@@ -339,6 +349,37 @@
                 }
             }
         };
+
+        function downloadVCard() {
+    const name = userData.name || "איש קשר";
+    const phone = userData.phone || "";
+    
+    // יצירת מבנה הקובץ שטלפונים מבינים
+    const vcard = `BEGIN:VCARD
+VERSION:3.0
+FN:${name}
+TEL;TYPE=CELL:${phone}
+END:VCARD`;
+
+    const blob = new Blob([vcard], { type: 'text/vcard' });
+    const url = window.URL.createObjectURL(blob);
+    const newLink = document.createElement('a');
+    newLink.href = url;
+    newLink.setAttribute('download', `${name}.vcf`);
+    newLink.click();
+}
+
+        async function trackClick(uid, linkIndex) {
+    // עדכון בבסיס הנתונים של פיירבייס
+    const userRef = db.collection("users").doc(uid);
+    
+    db.runTransaction(async (transaction) => {
+        const doc = await transaction.get(userRef);
+        const links = doc.data().links;
+        links[linkIndex].clicks = (links[linkIndex].clicks || 0) + 1;
+        transaction.update(userRef, { links: links });
+    });
+}
     </script>
 </body>
 </html>
