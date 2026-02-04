@@ -3,117 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioPro Ultra | הלינק החדש שלך</title>
+    <title>BioPro Ultra | הדור הבא</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200;400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Heebo', 'sans-serif'] },
+                    animation: {
+                        blob: "blob 7s infinite",
+                        float: "float 6s ease-in-out infinite",
+                    },
+                    keyframes: {
+                        blob: {
+                            "0%": { transform: "translate(0px, 0px) scale(1)" },
+                            "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+                            "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+                            "100%": { transform: "translate(0px, 0px) scale(1)" },
+                        },
+                        float: {
+                            "0%, 100%": { transform: "translateY(0)" },
+                            "50%": { transform: "translateY(-20px)" },
+                        }
+                    },
+                },
+            },
+        }
+    </script>
+
     <style>
-        :root { --primary: #6366f1; }
-        body { font-family: 'Assistant', sans-serif; background: #020617; color: white; overflow-x: hidden; margin: 0; }
-        
-        /* אפקטים של זכוכית ויוקרה */
-        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        
-        /* שלדת טלפון פרימיום */
-        .phone-frame {
-            width: 340px; height: 680px; border: 12px solid #0f172a; border-radius: 50px;
-            position: relative; background: #000; box-shadow: 0 0 100px -20px var(--primary);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .notch { width: 120px; height: 25px; background: #0f172a; position: absolute; top: 0; left: 50%; transform: translateX(-50%); border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; z-index: 30; }
+        /* כרום גלילה מותאם אישית */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #3730a3; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
 
-        /* אנימציות כפתורים */
-        .btn-link { 
-            opacity: 0; transform: translateY(15px); 
-            animation: slideIn 0.4s ease forwards;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
-        .btn-link:hover { transform: scale(1.05); filter: brightness(1.3); cursor: pointer; }
+        body { background-color: #020617; color: white; overflow-x: hidden; }
 
-        /* הילה זזה */
-        #cursorGlow {
-            position: fixed; width: 600px; height: 600px; background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, rgba(0,0,0,0) 70%);
-            pointer-events: none; z-index: -1; transform: translate(-50%, -50%);
+        /* אפקט זכוכית משופר */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* מסגרת טלפון ריאליסטית */
+        .phone-mockup {
+            width: 320px;
+            height: 650px;
+            border-radius: 55px;
+            border: 8px solid #282828;
+            position: relative;
+            background: #000;
+            box-shadow: 0 0 0 2px #444, 0 20px 50px -10px rgba(0,0,0,0.5);
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        /* Dynamic Island */
+        .dynamic-island {
+            width: 100px;
+            height: 28px;
+            background: #000;
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 20px;
+            z-index: 50;
+            transition: all 0.3s ease;
+        }
+        .phone-mockup:hover .dynamic-island { width: 120px; }
+
+        /* רקע אנימטיבי */
+        .bg-gradient-animate {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .input-group:focus-within label { color: #818cf8; }
+        .input-group:focus-within input, .input-group:focus-within textarea { border-color: #818cf8; background: rgba(255,255,255,0.05); }
     </style>
 </head>
-<body class="min-h-screen">
-    <div id="cursorGlow"></div>
+<body class="min-h-screen selection:bg-indigo-500 selection:text-white">
 
-    <div id="authContainer" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 p-6 transition-all duration-700">
-        <div class="glass p-10 rounded-[3rem] w-full max-w-md text-center space-y-8">
-            <div>
-                <h1 class="text-5xl font-black tracking-tighter text-white mb-2">Bio<span class="text-indigo-500">Pro.</span></h1>
-                <p class="text-slate-400 font-light">בנה כרטיס ביקור טוב יותר מלינקטרי - בחינם.</p>
-            </div>
-            <div class="space-y-4">
-                <input type="text" id="userInput" placeholder="בחר שם משתמש" class="w-full bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-indigo-500 transition-all text-center text-xl font-bold">
-                <button onclick="startApp()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-5 rounded-2xl font-black text-xl shadow-2xl shadow-indigo-500/20 transition-all transform active:scale-95">צור את הלינק שלי</button>
+    <div class="fixed inset-0 w-full h-full pointer-events-none z-0">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div class="absolute top-0 right-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    </div>
+
+    <div id="authScreen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#020617] transition-all duration-700">
+        <div class="relative group">
+            <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+            <div class="relative px-10 py-8 bg-[#0f172a] ring-1 ring-white/10 rounded-3xl leading-none flex items-center justify-center flex-col space-y-6">
+                <h1 class="text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400">BioPro.</h1>
+                <p class="text-slate-400">הכנס שם משתמש להתחלה</p>
+                <div class="flex gap-2 w-full">
+                    <span class="flex items-center text-slate-500 font-bold text-xl">@</span>
+                    <input type="text" id="usernameInput" class="bg-transparent border-b-2 border-slate-700 outline-none text-xl font-bold w-full focus:border-indigo-500 transition-colors py-2 text-center" placeholder="yourname">
+                </div>
+                <button onclick="enterApp()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/30 transition-all transform active:scale-95">צור כרטיס בחינם</button>
             </div>
         </div>
     </div>
 
-    <main id="mainApp" class="opacity-0 transition-opacity duration-1000 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 p-6 lg:p-12">
+    <main id="appContainer" class="relative z-10 max-w-[1600px] mx-auto p-4 lg:p-8 opacity-0 transition-opacity duration-1000 hidden">
         
-        <div class="lg:col-span-7 space-y-8">
-            <header class="flex justify-between items-center">
-                <h2 class="text-3xl font-black">עורך הכרטיס <span id="userNameDisplay" class="text-indigo-500 text-lg font-light block"></span></h2>
-                <button onclick="location.reload()" class="text-xs text-slate-500 hover:text-white border border-slate-800 px-4 py-2 rounded-xl transition">התנתק</button>
-            </header>
+        <header class="flex justify-between items-center mb-10 glass-panel p-4 rounded-2xl">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-bold text-lg">B</div>
+                <div>
+                    <h2 class="font-bold text-lg">עורך פרופיל</h2>
+                    <p id="displayUsername" class="text-xs text-indigo-400 font-mono tracking-wider">@USER</p>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="generateQR()" class="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm transition border border-white/5">
+                    <i class="fa-solid fa-qrcode"></i> QR Code
+                </button>
+                <button class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-bold shadow-lg shadow-indigo-500/20 transition">
+                    <i class="fa-solid fa-share-nodes"></i> פרסם
+                </button>
+            </div>
+        </header>
 
-            <div class="glass rounded-[2.5rem] p-8 space-y-10">
-                <section class="space-y-4">
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500">זהות המותג</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="nameIn" oninput="updatePreview()" placeholder="השם שלך (למשל: דניאל כהן)" class="bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-indigo-500 transition">
-                        <input type="text" id="imgIn" oninput="updatePreview()" placeholder="לינק לתמונה (URL)" class="bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-indigo-500 transition">
-                    </div>
-                    <textarea id="bioIn" oninput="updatePreview()" placeholder="ספר בקצרה מה אתה עושה..." class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-indigo-500 transition"></textarea>
-                </section>
-
-                <section class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500">קישורים (Instagram, TikTok וכו')</h3>
-                        <button onclick="addLinkRow()" class="text-indigo-400 text-sm font-bold hover:text-indigo-300">+ הוסף עוד</button>
-                    </div>
-                    <div id="linksList" class="space-y-3">
-                        <div class="flex gap-3 bg-white/5 p-3 rounded-2xl border border-white/5">
-                            <input type="text" placeholder="שם הקישור" class="label-in w-1/3 bg-transparent outline-none font-bold">
-                            <input type="text" placeholder="URL" class="url-in w-2/3 bg-transparent outline-none text-indigo-400" oninput="updatePreview()">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
+            
+            <div class="lg:col-span-7 space-y-6">
+                
+                <div class="glass-panel p-8 rounded-3xl space-y-6">
+                    <h3 class="flex items-center gap-2 text-lg font-bold text-slate-200">
+                        <i class="fa-solid fa-user-pen text-indigo-400"></i> פרטים בסיסיים
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="input-group space-y-2">
+                            <label class="text-xs uppercase font-bold text-slate-500 tracking-wider">שם מלא</label>
+                            <input type="text" id="nameField" oninput="render()" placeholder="ישראל ישראלי" class="w-full bg-[#020617] border border-white/10 p-4 rounded-xl outline-none transition-all">
+                        </div>
+                        <div class="input-group space-y-2">
+                            <label class="text-xs uppercase font-bold text-slate-500 tracking-wider">תמונת פרופיל (URL)</label>
+                            <input type="text" id="imgField" oninput="render()" placeholder="https://..." class="w-full bg-[#020617] border border-white/10 p-4 rounded-xl outline-none transition-all">
                         </div>
                     </div>
-                </section>
-
-                <section class="space-y-4">
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500">סגנון עיצובי</h3>
-                    <div class="grid grid-cols-4 gap-4">
-                        <button onclick="changeTheme('modern')" class="h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 border border-white/20"></button>
-                        <button onclick="changeTheme('cyber')" class="h-12 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 border border-white/20"></button>
-                        <button onclick="changeTheme('gold')" class="h-12 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-600 border border-white/20"></button>
-                        <button onclick="changeTheme('minimal')" class="h-12 rounded-xl bg-slate-800 border border-white/10"></button>
+                    
+                    <div class="input-group space-y-2">
+                        <label class="text-xs uppercase font-bold text-slate-500 tracking-wider">ביו / אודות</label>
+                        <textarea id="bioField" oninput="render()" rows="3" placeholder="ספר בקצרה על העיסוק שלך..." class="w-full bg-[#020617] border border-white/10 p-4 rounded-xl outline-none transition-all resize-none"></textarea>
                     </div>
-                </section>
-            </div>
-        </div>
+                </div>
 
-        <div class="lg:col-span-5 flex justify-center">
-            <div class="sticky top-12">
-                <div class="phone-frame" id="phoneBox">
-                    <div class="notch"></div>
-                    <div id="phoneContent" class="h-full p-8 flex flex-col items-center overflow-y-auto no-scrollbar transition-all duration-500" style="background: linear-gradient(180deg, #0f172a 0%, #000 100%);">
-                        
-                        <div id="prevImg" class="w-24 h-24 rounded-[2.5rem] bg-cover bg-center shadow-2xl border-4 border-white/10 mt-12 transition-all duration-500" style="background-image: url('https://ui-avatars.com/api/?background=333&color=fff&name=?');"></div>
-
-                        <h3 id="prevName" class="text-2xl font-extrabold mt-6 text-center">השם שלך</h3>
-                        <p id="prevBio" class="text-slate-400 text-sm mt-2 text-center px-4 leading-relaxed font-light">איך יראה הכרטיס שלך? מלא את הפרטים.</p>
-
-                        <div id="prevLinks" class="w-full mt-10 space-y-4">
+                <div class="glass-panel p-8 rounded-3xl space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="flex items-center gap-2 text-lg font-bold text-slate-200">
+                            <i class="fa-solid fa-link text-indigo-400"></i> קישורים
+                        </h3>
+                        <button onclick="addLink()" class="text-xs bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full border border-indigo-500/20 hover:bg-indigo-500/20 transition">+ הוסף חדש</button>
+                    </div>
+                    
+                    <div id="linksContainer" class="space-y-4">
+                        <div class="link-item group flex gap-4 bg-[#020617] p-4 rounded-2xl border border-white/5 hover:border-indigo-500/30 transition-all">
+                            <div class="flex flex-col gap-1 flex-1">
+                                <input type="text" class="link-title bg-transparent font-bold outline-none placeholder-slate-600" placeholder="כותרת (למשל: אינסטגרם)" oninput="render()">
+                                <input type="text" class="link-url text-sm text-indigo-400 bg-transparent outline-none placeholder-indigo-900/50" placeholder="https://..." oninput="render()">
                             </div>
+                            <button onclick="this.closest('.link-item').remove(); render()" class="text-slate-600 hover:text-red-400 transition"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
 
-                        <div class="mt-auto pt-10 opacity-30 text-[10px] tracking-widest uppercase">
-                            Premium by BioPro
+                <div class="glass-panel p-8 rounded-3xl space-y-6">
+                    <h3 class="flex items-center gap-2 text-lg font-bold text-slate-200">
+                        <i class="fa-solid fa-palette text-indigo-400"></i> עיצוב וצבעים
+                    </h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div onclick="setTheme('dark')" class="cursor-pointer h-24 rounded-xl bg-slate-900 border-2 border-indigo-500 flex items-center justify-center relative overflow-hidden group">
+                            <span class="z-10 font-bold text-sm">Dark Pro</span>
+                        </div>
+                        <div onclick="setTheme('sunset')" class="cursor-pointer h-24 rounded-xl bg-gradient-to-br from-orange-500 to-purple-600 border border-transparent hover:scale-105 transition flex items-center justify-center">
+                            <span class="font-bold text-sm text-white drop-shadow-md">Sunset</span>
+                        </div>
+                        <div onclick="setTheme('ocean')" class="cursor-pointer h-24 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 border border-transparent hover:scale-105 transition flex items-center justify-center">
+                            <span class="font-bold text-sm text-white drop-shadow-md">Ocean</span>
+                        </div>
+                        <div onclick="setTheme('forest')" class="cursor-pointer h-24 rounded-xl bg-[#0f2e1a] border border-green-800 hover:scale-105 transition flex items-center justify-center">
+                            <span class="font-bold text-sm text-green-400">Forest</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="lg:col-span-5 flex flex-col items-center">
+                <div class="sticky top-10">
+                    <div class="text-center mb-6">
+                        <h4 class="text-sm font-bold text-slate-500 uppercase tracking-widest">Live Preview</h4>
+                    </div>
+                    
+                    <div class="phone-mockup shadow-2xl overflow-hidden">
+                        <div class="dynamic-island"></div>
+                        
+                        <div id="phoneScreen" class="w-full h-full overflow-y-auto overflow-x-hidden relative scrollbar-hide">
+                            <div id="phoneBg" class="absolute inset-0 z-0 bg-slate-900 transition-all duration-500"></div>
+                            
+                            <div class="relative z-10 flex flex-col items-center pt-20 px-6 pb-10 min-h-full">
+                                
+                                <div class="relative">
+                                    <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full blur opacity-75"></div>
+                                    <img id="prevImg" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" class="relative w-24 h-24 rounded-full object-cover border-4 border-black shadow-xl" alt="Profile">
+                                </div>
+
+                                <h2 id="prevName" class="mt-4 text-xl font-bold text-center text-white">Your Name</h2>
+                                <p id="prevBio" class="mt-2 text-xs text-center text-white/70 font-light leading-relaxed max-w-[250px]">Bio description will appear here...</p>
+
+                                <div id="prevLinks" class="w-full mt-8 space-y-3">
+                                    </div>
+
+                                <div class="mt-auto pt-8">
+                                    <p class="text-[10px] uppercase tracking-widest opacity-40 font-bold">BioPro</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -121,75 +243,128 @@
         </div>
     </main>
 
-    <script>
-        // תנועת ההילה
-        document.addEventListener('mousemove', (e) => {
-            const glow = document.getElementById('cursorGlow');
-            glow.style.left = e.clientX + 'px';
-            glow.style.top = e.clientY + 'px';
-        });
+    <div id="qrModal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white p-8 rounded-3xl text-center space-y-4 max-w-sm w-full mx-4">
+            <h3 class="text-2xl font-bold text-slate-800">הסריקה שלך מוכנה</h3>
+            <div class="bg-slate-100 p-4 rounded-xl inline-block">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=BioProExample" alt="QR" class="mix-blend-multiply">
+            </div>
+            <p class="text-slate-500 text-sm">סרוק כדי לצפות בפרופיל במובייל</p>
+            <button onclick="closeQR()" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold">סגור</button>
+        </div>
+    </div>
 
-        function startApp() {
-            const user = document.getElementById('userInput').value;
-            if(!user) return alert("נא לבחור שם משתמש");
+    <script>
+        // לוגיקה
+        let currentTheme = 'dark';
+        const themes = {
+            dark: { bg: '#0f172a', btn: 'bg-white/10 hover:bg-white/20 border-white/5', text: 'text-white' },
+            sunset: { bg: 'linear-gradient(180deg, #4c1d95 0%, #be185d 100%)', btn: 'bg-black/20 hover:bg-black/30 border-white/10', text: 'text-white' },
+            ocean: { bg: 'linear-gradient(180deg, #155e75 0%, #0891b2 100%)', btn: 'bg-white/20 backdrop-blur-md border-white/20', text: 'text-white' },
+            forest: { bg: '#052e16', btn: 'bg-[#14532d] border-green-800 text-green-100', text: 'text-green-50' }
+        };
+
+        function enterApp() {
+            const user = document.getElementById('usernameInput').value;
+            if(!user) return alert('נא להזין שם משתמש');
             
-            document.getElementById('userNameDisplay').innerText = "@" + user;
-            document.getElementById('authContainer').style.opacity = '0';
-            document.getElementById('authContainer').style.pointerEvents = 'none';
+            document.getElementById('displayUsername').innerText = '@' + user;
             
+            const auth = document.getElementById('authScreen');
+            auth.style.opacity = '0';
             setTimeout(() => {
-                document.getElementById('mainApp').classList.remove('opacity-0');
-            }, 500);
+                auth.style.display = 'none';
+                const app = document.getElementById('appContainer');
+                app.classList.remove('hidden');
+                // Timeout קצר כדי לאפשר הסרת ה-display: none לפני שינוי ה-opacity
+                setTimeout(() => app.classList.remove('opacity-0'), 50);
+            }, 700);
         }
 
-        function addLinkRow() {
-            const container = document.getElementById('linksList');
+        function addLink() {
+            const container = document.getElementById('linksContainer');
             const div = document.createElement('div');
-            div.className = 'flex gap-3 bg-white/5 p-3 rounded-2xl border border-white/5';
+            div.className = 'link-item group flex gap-4 bg-[#020617] p-4 rounded-2xl border border-white/5 hover:border-indigo-500/30 transition-all animation-fade-in';
             div.innerHTML = `
-                <input type="text" placeholder="שם" class="label-in w-1/3 bg-transparent outline-none font-bold">
-                <input type="text" placeholder="URL" class="url-in w-2/3 bg-transparent outline-none text-indigo-400" oninput="updatePreview()">
+                <div class="flex flex-col gap-1 flex-1">
+                    <input type="text" class="link-title bg-transparent font-bold outline-none placeholder-slate-600" placeholder="כותרת" oninput="render()">
+                    <input type="text" class="link-url text-sm text-indigo-400 bg-transparent outline-none placeholder-indigo-900/50" placeholder="URL" oninput="render()">
+                </div>
+                <button onclick="this.closest('.link-item').remove(); render()" class="text-slate-600 hover:text-red-400 transition"><i class="fa-solid fa-trash"></i></button>
             `;
             container.appendChild(div);
         }
 
-        const themes = {
-            modern: { bg: 'linear-gradient(180deg, #1e1b4b 0%, #000 100%)', btn: 'bg-white/10 shadow-indigo-500/10', color: 'white' },
-            cyber: { bg: 'linear-gradient(180deg, #083344 0%, #000 100%)', btn: 'bg-cyan-500/20 border-cyan-500/50', color: '#22d3ee' },
-            gold: { bg: 'linear-gradient(180deg, #451a03 0%, #000 100%)', btn: 'bg-gradient-to-r from-yellow-600 to-orange-600', color: 'white' },
-            minimal: { bg: '#050505', btn: 'border border-white/10 bg-white/5', color: 'white' }
-        };
-
-        let activeTheme = 'modern';
-
-        function changeTheme(t) {
-            activeTheme = t;
-            const phone = document.getElementById('phoneContent');
-            phone.style.background = themes[t].bg;
-            updatePreview();
+        function getIcon(url) {
+            url = url.toLowerCase();
+            if(url.includes('instagram')) return '<i class="fa-brands fa-instagram text-xl"></i>';
+            if(url.includes('twitter') || url.includes('x.com')) return '<i class="fa-brands fa-x-twitter text-xl"></i>';
+            if(url.includes('linkedin')) return '<i class="fa-brands fa-linkedin text-xl"></i>';
+            if(url.includes('facebook')) return '<i class="fa-brands fa-facebook text-xl"></i>';
+            if(url.includes('tiktok')) return '<i class="fa-brands fa-tiktok text-xl"></i>';
+            if(url.includes('youtube')) return '<i class="fa-brands fa-youtube text-xl"></i>';
+            if(url.includes('github')) return '<i class="fa-brands fa-github text-xl"></i>';
+            if(url.includes('whatsapp')) return '<i class="fa-brands fa-whatsapp text-xl"></i>';
+            return '<i class="fa-solid fa-link text-xl"></i>';
         }
 
-        function updatePreview() {
-            document.getElementById('prevName').innerText = document.getElementById('nameIn').value || "השם שלך";
-            document.getElementById('prevBio').innerText = document.getElementById('bioIn').value || "הביוגרפיה שלך תראה כאן מדהים...";
+        function render() {
+            // עדכון טקסטים
+            const name = document.getElementById('nameField').value;
+            const bio = document.getElementById('bioField').value;
+            const img = document.getElementById('imgField').value;
+
+            document.getElementById('prevName').innerText = name || "Your Name";
+            document.getElementById('prevBio').innerText = bio || "Bio description...";
+            if(img) document.getElementById('prevImg').src = img;
+
+            // עדכון לינקים
+            const linksDiv = document.getElementById('prevLinks');
+            linksDiv.innerHTML = '';
             
-            const img = document.getElementById('imgIn').value;
-            if(img) document.getElementById('prevImg').style.backgroundImage = `url('${img}')`;
+            const linkItems = document.querySelectorAll('.link-item');
+            const themeObj = themes[currentTheme];
 
-            const labels = document.querySelectorAll('.label-in');
-            const container = document.getElementById('prevLinks');
-            container.innerHTML = '';
+            linkItems.forEach(item => {
+                const title = item.querySelector('.link-title').value;
+                const url = item.querySelector('.link-url').value;
 
-            labels.forEach((l, i) => {
-                if(l.value) {
-                    const btn = document.createElement('div');
-                    btn.className = `btn-link w-full py-4 px-6 rounded-2xl font-bold text-center text-sm shadow-xl ${themes[activeTheme].btn}`;
-                    btn.style.color = themes[activeTheme].color;
-                    btn.style.animationDelay = (i * 0.1) + 's';
-                    btn.innerText = l.value;
-                    container.appendChild(btn);
+                if(title) {
+                    const icon = getIcon(url || '');
+                    const btn = document.createElement('a');
+                    btn.href = url || '#';
+                    btn.target = "_blank";
+                    btn.className = `flex items-center justify-between w-full p-4 rounded-xl border backdrop-blur-sm shadow-lg transition-all hover:scale-[1.02] active:scale-95 ${themeObj.btn} ${themeObj.text}`;
+                    btn.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="opacity-70">${icon}</span>
+                            <span class="font-bold text-sm">${title}</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-left opacity-50 text-xs"></i>
+                    `;
+                    linksDiv.appendChild(btn);
                 }
             });
+        }
+
+        function setTheme(themeName) {
+            currentTheme = themeName;
+            const bgDiv = document.getElementById('phoneBg');
+            bgDiv.style.background = themes[themeName].bg;
+            render(); // Rerender buttons with new styles
+        }
+
+        // QR Code Logic
+        function generateQR() {
+            const modal = document.getElementById('qrModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeQR() {
+            const modal = document.getElementById('qrModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
         }
     </script>
 </body>
