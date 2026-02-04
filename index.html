@@ -14,13 +14,21 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
-        body { background-color: #030712; color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .phone-container { width: 320px; height: 650px; border: 12px solid #1f2937; border-radius: 48px; position: relative; overflow: hidden; background: #000; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7); }
-        .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 140px; height: 25px; background: #1f2937; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; z-index: 50; }
-        .link-card { transition: all 0.3s ease; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-
+body { 
+    background: radial-gradient(circle at top right, #1e1b4b, #030712 50%, #000);
+    background-attachment: fixed;
+    color: white; 
+    font-family: 'Inter', sans-serif; 
+}
+.glass { 
+    background: rgba(255, 255, 255, 0.02); 
+    backdrop-filter: blur(25px) saturate(150%); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+}
+/* תוסיף את זה כדי שהלינקים יכנסו באנימציה */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.link-anim { animation: fadeIn 0.4s ease forwards; }‏“
         /* Themes */
         .theme-classic { background: #050505; color: white; }
         .theme-ocean { background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%); color: white; }
@@ -170,35 +178,35 @@
             });
         }
 
-        function renderPreview() {
-            document.getElementById('pName').innerText = userData.name || "השם שלך";
-            document.getElementById('pImg').src = userData.img || "https://ui-avatars.com/api/?name=User";
-            const container = document.getElementById('pLinks');
-            container.innerHTML = '';
+function renderPreview() {
+    document.getElementById('pName').innerText = userData.name || "השם שלך";
+    document.getElementById('pImg').src = userData.img || `https://ui-avatars.com/api/?name=${userData.name || 'User'}&background=random`;
+    
+    const container = document.getElementById('pLinks');
+    container.innerHTML = ''; // מנקה הכל לפני רינדור מחדש
 
-            // בתוך הלופ של ה-forEach ב-renderPreview:
-const style = getSocialStyle(l.u || ""); // השורה הזו מחלצת את האייקון והצבע
-const btn = document.createElement('a');
-// הוספת הקלאסים הדינמיים:
-btn.className = `flex items-center justify-between p-4 rounded-2xl shadow-lg ${style.color} text-white`;
-btn.innerHTML = `
-    <div class="flex items-center gap-3">
-        <i class="${style.icon}"></i>
-        <span>${l.t}</span>
-    </div>`;
-            
-            userData.links.forEach((l, i) => {
-                if(!l.t) return;
-                const style = getSocialStyle(l.u || "");
-                const btn = document.createElement('a');
-                btn.href = l.u || "#";
-                btn.target = "_blank";
-                btn.className = `flex items-center justify-between p-4 rounded-2xl shadow-lg ${userData.theme === 'theme-minimal' ? 'bg-slate-100 text-black' : style.color + ' text-white'}`;
-                btn.innerHTML = `<div class="flex items-center gap-3"><i class="${style.icon}"></i><span>${l.t}</span></div>`;
-                btn.onclick = () => trackClick(auth.currentUser.uid, i);
-                container.appendChild(btn);
-            });
-        }
+    userData.links.forEach((l, i) => {
+        if(!l.t) return;
+        const style = getSocialStyle(l.u || "");
+        const btn = document.createElement('a');
+        btn.href = l.u || "#";
+        btn.target = "_blank";
+        // הוספת עיצוב דינמי לפי התמה
+        const isMinimal = userData.theme === 'theme-minimal';
+        btn.className = `link-anim flex items-center justify-between p-4 rounded-2xl transition-all duration-300 hover:scale-[1.03] shadow-lg ${isMinimal ? 'bg-white text-black' : style.color + ' text-white'}`;
+        btn.style.animationDelay = `${i * 0.1}s`;
+        btn.innerHTML = `<div class="flex items-center gap-3"><i class="${style.icon}"></i><span class="font-bold">${l.t}</span></div><i class="fa-solid fa-chevron-left opacity-30 text-xs"></i>`;
+        btn.onclick = () => trackClick(auth.currentUser.uid, i);
+        container.appendChild(btn);
+    });
+}
+
+        function copyPublicLink() {
+    const url = window.location.href.split('?')[0] + "?u=" + auth.currentUser.uid;
+    navigator.clipboard.writeText(url).then(() => {
+        alert("הקישור הועתק! שלח אותו בוואטסאפ");
+    });
+}
 
         function updateLink(i, f, v) { userData.links[i][f] = v; autoSave(); }
         function addNewLink() { userData.links.push({t:'', u:'', clicks:0}); renderEditor(); }
@@ -228,6 +236,19 @@ btn.innerHTML = `
             a.download = "contact.vcf";
             a.click();
         }
+
+        async function authAction(type) {
+    try {
+        if (type === 'google') {
+            await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+        } else {
+            const e = document.getElementById('email').value, p = document.getElementById('pass').value;
+            if(!e || !p) return alert("מלא פרטים");
+            try { await auth.signInWithEmailAndPassword(e, p); } 
+            catch { await auth.createUserWithEmailAndPassword(e, p); }
+        }
+    } catch (err) { alert(err.message); }
+}
 
 async function trackClick(uid, linkIndex) {
     const userRef = db.collection("users").doc(uid);
