@@ -2,134 +2,234 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioPro Cloud | Professional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BioPro Ultra | הכרטיס הדיגיטלי שלך</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Heebo', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            light: '#1e293b',
+                            accent: '#6366f1',
+                            accentHover: '#4f46e5'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pop': 'pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        pop: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
-body { 
-    background: radial-gradient(circle at top right, #1e1b4b, #030712 50%, #000);
-    background-attachment: fixed;
-    color: white; 
-    font-family: 'Inter', sans-serif; 
-}
-.glass { 
-    background: rgba(255, 255, 255, 0.02); 
-    backdrop-filter: blur(25px) saturate(150%); 
-    border: 1px solid rgba(255, 255, 255, 0.1); 
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-}
-/* תוסיף את זה כדי שהלינקים יכנסו באנימציה */
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.link-anim { animation: fadeIn 0.4s ease forwards; }‏“
+        body { 
+            background-color: #020617;
+            color: white;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-heavy {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Utilities */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .loader {
+            width: 48px; height: 48px;
+            border: 5px solid #FFF;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         /* Themes */
-        .theme-classic { background: #050505; color: white; }
-        .theme-ocean { background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%); color: white; }
-        .theme-sunset { background: linear-gradient(135deg, #4c1d95 0%, #db2777 100%); color: white; }
-        .theme-minimal { background: #ffffff; color: #111; }
+        .theme-midnight { background: #000000; color: white; --card-bg: rgba(255,255,255,0.1); }
+        .theme-ocean { background: linear-gradient(180deg, #0f172a 0%, #0284c7 100%); color: white; --card-bg: rgba(255,255,255,0.15); }
+        .theme-cotton { background: #f8fafc; color: #1e293b; --card-bg: white; }
+        .theme-cotton .text-white { color: #1e293b !important; } /* Invert text for light theme */
+        .theme-cotton .glass { background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1); }
+        .theme-neon { background: #111; color: #0f0; font-family: 'Courier New', monospace; --card-bg: rgba(0, 255, 0, 0.1); border: 1px solid #0f0; }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col font-sans">
 
-    <div id="loginScreen" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#030712]">
-        <div class="relative glass p-10 rounded-[3rem] w-full max-w-md text-center space-y-8 mx-4 shadow-2xl">
-            <h1 class="text-4xl font-black">BioPro <span class="text-indigo-500">Cloud</span></h1>
+    <div id="toast-container" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none w-full max-w-sm px-4"></div>
+
+    <div id="global-loader" class="fixed inset-0 z-[200] bg-[#020617] flex flex-col items-center justify-center transition-opacity duration-700">
+        <span class="loader mb-4"></span>
+        <h2 class="text-xl font-display font-bold tracking-widest animate-pulse">BIOPRO</h2>
+    </div>
+
+    <div id="auth-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 overflow-hidden -z-10">
+            <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-600/20 rounded-full blur-[100px] animate-float"></div>
+            <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/20 rounded-full blur-[100px] animate-float" style="animation-delay: 2s;"></div>
+        </div>
+
+        <div class="glass p-8 md:p-12 rounded-[2.5rem] w-full max-w-md text-center shadow-2xl relative overflow-hidden">
+            <div class="mb-8">
+                <h1 class="text-4xl md:text-5xl font-black font-display mb-2 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">BioPro</h1>
+                <p class="text-slate-400 text-sm">פלטפורמת הקישורים המתקדמת בישראל</p>
+            </div>
+
             <div class="space-y-4">
-                <button onclick="authAction('google')" class="w-full flex items-center justify-center gap-3 p-4 bg-white text-black rounded-2xl font-bold hover:bg-slate-200 transition">
-                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-5 h-5"> המשך עם Google
+                <button onclick="loginWithGoogle()" class="w-full group relative flex items-center justify-center gap-3 p-4 bg-white text-slate-900 rounded-2xl font-bold hover:shadow-lg hover:shadow-indigo-500/20 transition-all active:scale-95">
+                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-5 h-5 group-hover:scale-110 transition">
+                    <span>המשך באמצעות Google</span>
                 </button>
-                <div class="opacity-20 text-xs text-white">או באמצעות אימייל</div>
-                <input type="email" id="email" placeholder="אימייל" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none text-center">
-                <input type="password" id="pass" placeholder="סיסמה" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none text-center">
-                <button onclick="authAction('email')" class="w-full p-4 bg-indigo-600 rounded-2xl font-bold text-white">כניסה / הרשמה</button>
+
+                <div class="relative py-2 opacity-50">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/20"></div></div>
+                    <div class="relative flex justify-center"><span class="bg-[#0f172a]/50 px-2 text-xs">או ידנית</span></div>
+                </div>
+
+                <form onsubmit="event.preventDefault(); loginWithEmail()" class="space-y-3">
+                    <input type="email" id="email" placeholder="אימייל" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 transition text-center placeholder-slate-500">
+                    <input type="password" id="pass" placeholder="סיסמה" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 transition text-center placeholder-slate-500">
+                    <button type="submit" class="w-full p-4 bg-gradient-to-r from-indigo-600 to-violet-600 rounded-xl font-bold hover:opacity-90 transition shadow-lg shadow-indigo-900/50">כניסה / הרשמה</button>
+                </form>
             </div>
+            
+            <p id="auth-error" class="mt-4 text-red-400 text-xs hidden"></p>
         </div>
     </div>
 
-    <div id="adminPanel" class="hidden min-h-screen">
-        <nav class="glass sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
-            <span class="font-black italic text-indigo-500">BIOPRO PRO</span>
-            <div class="flex gap-4">
-                <button onclick="toggleShareMenu()" class="bg-indigo-600 px-4 py-2 rounded-full text-xs font-bold">שיתוף</button>
-                <button onclick="auth.signOut()" class="text-slate-400"><i class="fa-solid fa-power-off"></i></button>
+    <div id="dashboard" class="hidden h-screen flex overflow-hidden">
+        
+        <aside class="flex-1 flex flex-col h-full relative z-10 bg-[#020617]">
+            <header class="glass-heavy px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+                <div class="flex items-center gap-2">
+                    <span class="font-display font-black text-xl bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">BIOPRO</span>
+                    <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full font-bold">PRO</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="shareProfile()" class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/30"><i class="fa-solid fa-share-nodes"></i></button>
+                    <button onclick="logout()" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-red-500/20 hover:text-red-400 transition"><i class="fa-solid fa-power-off"></i></button>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-8 pb-32">
+                
+                <div class="glass p-5 rounded-3xl flex justify-between items-center bg-gradient-to-br from-indigo-900/20 to-transparent">
+                    <div>
+                        <div class="text-slate-400 text-xs mb-1">סה"כ צפיות וקליקים</div>
+                        <div class="text-3xl font-display font-bold text-white"><span id="total-clicks">0</span></div>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xl">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                </div>
+
+                <section class="space-y-4">
+                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider px-2">פרופיל אישי</h3>
+                    <div class="glass p-5 rounded-3xl space-y-4">
+                        <div class="flex items-center gap-4">
+                            <div class="relative group cursor-pointer w-20 h-20 flex-shrink-0">
+                                <img id="editor-avatar" src="" class="w-full h-full rounded-2xl object-cover border-2 border-white/10 group-hover:border-indigo-500 transition">
+                                <div class="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition backdrop-blur-sm">
+                                    <i class="fa-solid fa-camera text-white"></i>
+                                </div>
+                                <input type="file" accept="image/*" onchange="handleImageUpload(this)" class="absolute inset-0 opacity-0 cursor-pointer">
+                            </div>
+                            <div class="flex-1 space-y-2">
+                                <input type="text" id="nameIn" oninput="debouncedSave()" placeholder="שם התצוגה" class="w-full bg-transparent border-b border-white/10 pb-2 focus:border-indigo-500 outline-none font-bold text-lg transition">
+                                <input type="text" id="bioIn" oninput="debouncedSave()" placeholder="תיאור קצר (Bio)" class="w-full bg-transparent border-b border-white/10 pb-2 focus:border-indigo-500 outline-none text-sm text-slate-400 transition">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="space-y-4">
+                    <div class="flex justify-between items-center px-2">
+                        <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider">קישורים</h3>
+                        <button onclick="addLink()" class="text-xs bg-indigo-600 hover:bg-indigo-500 px-3 py-1.5 rounded-lg transition font-bold"><i class="fa-solid fa-plus ml-1"></i> הוסף חדש</button>
+                    </div>
+                    <div id="links-editor-container" class="space-y-3">
+                        </div>
+                </section>
+
+                <section class="space-y-4">
+                    <h3 class="text-slate-400 text-xs font-bold uppercase tracking-wider px-2">עיצוב</h3>
+                    <div class="grid grid-cols-4 gap-3">
+                        <button onclick="changeTheme('theme-midnight')" class="h-14 rounded-2xl bg-black border border-white/20 hover:scale-105 transition shadow-lg"></button>
+                        <button onclick="changeTheme('theme-ocean')" class="h-14 rounded-2xl bg-gradient-to-b from-slate-800 to-blue-600 border border-white/20 hover:scale-105 transition shadow-lg"></button>
+                        <button onclick="changeTheme('theme-cotton')" class="h-14 rounded-2xl bg-slate-100 border border-white/20 hover:scale-105 transition shadow-lg"></button>
+                        <button onclick="changeTheme('theme-neon')" class="h-14 rounded-2xl bg-black border border-green-500 hover:scale-105 transition shadow-lg relative overflow-hidden"><div class="absolute inset-0 bg-green-500/20"></div></button>
+                    </div>
+                </section>
             </div>
-        </nav>
+        </aside>
 
-<div class="glass p-8 rounded-[2.5rem] space-y-6 relative overflow-hidden group">
-    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-[50px] -z-10 pointer-events-none"></div>
-
-    <h3 class="font-black text-2xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
-        <i class="fa-solid fa-user-astronaut ml-2"></i> הגדרות פרופיל
-    </h3>
-
-    <div class="relative">
-        <i class="fa-regular fa-user absolute top-1/2 right-4 -translate-y-1/2 text-slate-400"></i>
-        <input type="text" id="nameIn" oninput="autoSave()" placeholder="שם התצוגה שלך" 
-        class="w-full bg-black/40 pr-10 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 transition-all focus:bg-white/5 placeholder-slate-600">
+        <main class="hidden lg:flex flex-1 bg-[#0f172a] items-center justify-center relative border-r border-white/5">
+            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#4f46e5 1px, transparent 1px); background-size: 32px 32px;"></div>
+            
+            <div class="relative w-[340px] h-[700px] bg-black rounded-[3.5rem] border-8 border-[#1e293b] shadow-2xl overflow-hidden ring-4 ring-black/50">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-[#1e293b] rounded-b-xl z-30"></div>
+                
+                <div id="preview-container" class="w-full h-full overflow-y-auto no-scrollbar relative z-10 pt-10">
+                    </div>
+            </div>
+            
+            <div class="absolute bottom-8 text-slate-500 text-xs font-mono">LIVE PREVIEW</div>
+        </main>
     </div>
 
-    <div class="relative">
-        <i class="fa-solid fa-quote-right absolute top-4 right-4 text-slate-400 text-xs"></i>
-        <textarea id="bioIn" oninput="autoSave()" placeholder="כתוב משהו קצר על עצמך... (Bio)" rows="2"
-        class="w-full bg-black/40 pr-10 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 transition-all focus:bg-white/5 placeholder-slate-600 resize-none"></textarea>
-    </div>
-
-    <div class="grid grid-cols-2 gap-4">
-        <div class="relative">
-            <i class="fa-solid fa-phone absolute top-1/2 right-4 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="phoneIn" oninput="autoSave()" placeholder="טלפון" 
-            class="w-full bg-black/40 pr-10 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 transition-all text-sm">
+    <div id="public-view" class="hidden min-h-screen w-full transition-colors duration-500">
         </div>
-        <div class="relative">
-            <i class="fa-solid fa-image absolute top-1/2 right-4 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input type="text" id="imgIn" oninput="autoSave()" placeholder="כתובת תמונה URL" 
-            class="w-full bg-black/40 pr-10 p-4 rounded-xl border border-white/10 outline-none focus:border-indigo-500 transition-all text-sm">
-        </div>
-    </div>
-
-    <div class="pt-4 border-t border-white/5">
-        <span class="text-xs text-slate-400 mb-2 block">בחר עיצוב:</span>
-        <div class="flex gap-3">
-            <button onclick="setTheme('theme-classic')" class="w-10 h-10 rounded-full bg-black border-2 border-white/20 hover:scale-110 transition ring-2 ring-transparent focus:ring-indigo-500"></button>
-            <button onclick="setTheme('theme-ocean')" class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-900 to-slate-900 border-2 border-white/20 hover:scale-110 transition"></button>
-            <button onclick="setTheme('theme-sunset')" class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-600 to-purple-900 border-2 border-white/20 hover:scale-110 transition"></button>
-            <button onclick="setTheme('theme-minimal')" class="w-10 h-10 rounded-full bg-white border-2 border-slate-200 hover:scale-110 transition"></button>
-        </div>
-    </div>
-</div>
-
-<div class="bg-[#0f0f11] border border-white/10 p-8 rounded-[2.5rem] text-center space-y-6 max-w-sm w-full relative overflow-hidden">
-    <h3 class="text-xl font-bold text-white">שתף את הכרטיס</h3>
-    
-    <div class="relative group mx-auto w-fit">
-        <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000"></div>
-        <div id="qrcode" class="relative bg-white p-3 rounded-xl"></div>
-    </div>
-
-    <div class="grid grid-cols-4 gap-2">
-        <button onclick="shareTo('whatsapp')" class="p-3 rounded-xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition"><i class="fa-brands fa-whatsapp text-xl"></i></button>
-        <button onclick="shareTo('facebook')" class="p-3 rounded-xl bg-[#1877F2]/10 text-[#1877F2] hover:bg-[#1877F2] hover:text-white transition"><i class="fa-brands fa-facebook text-xl"></i></button>
-        <button onclick="shareTo('linkedin')" class="p-3 rounded-xl bg-[#0A66C2]/10 text-[#0A66C2] hover:bg-[#0A66C2] hover:text-white transition"><i class="fa-brands fa-linkedin text-xl"></i></button>
-        <button onclick="shareTo('twitter')" class="p-3 rounded-xl bg-[#1DA1F2]/10 text-[#1DA1F2] hover:bg-[#1DA1F2] hover:text-white transition"><i class="fa-brands fa-twitter text-xl"></i></button>
-    </div>
-
-    <button onclick="copyPublicLink()" class="flex items-center justify-center gap-2 w-full p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl font-bold transition">
-        <i class="fa-regular fa-copy"></i> העתק קישור
-    </button>
-    
-    <button onclick="toggleShareMenu()" class="text-slate-500 text-sm hover:text-white transition">סגור חלונית</button>
-</div>
 
     <script>
+        // --- CONFIGURATION ---
+        // TODO: החלף את הערכים למטה בערכים מה-Firebase Console שלך
         const firebaseConfig = {
-            apiKey: "AIzaSyCQ4JuNyv-OLszK57jgjxsQi4qlOuSJkq8",
+            apiKey: "AIzaSyCQ4JuNyv-OLszK57jgjxsQi4qlOuSJkq8", // דוגמה
             authDomain: "biopro-55077.firebaseapp.com",
             projectId: "biopro-55077",
             storageBucket: "biopro-55077.firebasestorage.app",
@@ -137,182 +237,402 @@ body {
             appId: "1:590826980798:web:c9a587aa501d30b849a5ef"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let userData = { name: "", phone: "", img: "", theme: "theme-classic", links: [] };
-        let saveTimeout;
+        // Global State
+        let currentUser = null;
+        let userData = {
+            name: "",
+            bio: "",
+            img: "",
+            theme: "theme-midnight",
+            links: []
+        };
+        let saveTimer;
+        const urlParams = new URLSearchParams(window.location.search);
+        const publicUid = urlParams.get('u');
 
-        // Auth Logic
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminPanel').classList.remove('hidden');
-                fetchUserData(user.uid);
+        // --- LIFECYCLE ---
+        window.addEventListener('load', () => {
+            if (publicUid) {
+                // Public Mode
+                loadPublicProfile(publicUid);
             } else {
-                document.getElementById('loginScreen').style.display = 'flex';
-                document.getElementById('adminPanel').classList.add('hidden');
+                // Admin Mode
+                initAuthObserver();
             }
         });
 
-        authAction
-async function fetchUserData(uid) {
-    const doc = await db.collection("users").doc(uid).get();
-    if (doc.exists) {
-        userData = doc.data();
-        document.getElementById('nameIn').value = userData.name || "";
-        document.getElementById('bioIn').value = userData.bio || ""; // <--- הוספנו את זה
-        document.getElementById('phoneIn').value = userData.phone || "";
-        document.getElementById('imgIn').value = userData.img || "";
-        setTheme(userData.theme || 'theme-classic');
-        renderEditor();
-    }
-    renderPreview();
-}
-
-        // Helper: Social Styles
-        function getSocialStyle(url) {
-            const l = url.toLowerCase();
-            if(l.includes('instagram')) return { icon: 'fa-brands fa-instagram', color: 'bg-[#E1306C]' };
-            if(l.includes('tiktok')) return { icon: 'fa-brands fa-tiktok', color: 'bg-black' };
-            if(l.includes('wa.me') || l.includes('whatsapp')) return { icon: 'fa-brands fa-whatsapp', color: 'bg-[#25D366]' };
-            return { icon: 'fa-solid fa-link', color: 'bg-indigo-600' };
-        }
-
-        function shareTo(platform) {
-    const url = encodeURIComponent(window.location.href.split('?')[0] + "?u=" + auth.currentUser.uid);
-    const text = encodeURIComponent("היי, תראו את הכרטיס הדיגיטלי החדש שלי! 🚀");
-    let shareUrl = "";
-
-    if(platform === 'whatsapp') shareUrl = `https://wa.me/?text=${text} ${url}`;
-    if(platform === 'facebook') shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-    if(platform === 'linkedin') shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
-    if(platform === 'twitter') shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
-
-    window.open(shareUrl, '_blank');
-}
-
-        function renderEditor() {
-            const container = document.getElementById('linksEditor');
-            container.innerHTML = '';
-            userData.links.forEach((link, i) => {
-                const d = document.createElement('div');
-                d.className = "flex gap-2 items-center bg-white/5 p-3 rounded-xl";
-                d.innerHTML = `
-                    <div class="flex-1 space-y-1">
-                        <input oninput="updateLink(${i}, 't', this.value)" value="${link.t}" placeholder="כותרת" class="w-full bg-transparent text-sm font-bold outline-none">
-                        <input oninput="updateLink(${i}, 'u', this.value)" value="${link.u}" placeholder="לינק" class="w-full bg-transparent text-xs text-indigo-400 outline-none">
-                    </div>
-                    <div class="text-[10px] opacity-30 text-center px-2">קליקים<br>${link.clicks || 0}</div>
-                    <button onclick="removeLink(${i})" class="text-red-900"><i class="fa-solid fa-trash"></i></button>
-                `;
-                container.appendChild(d);
+        // --- AUTH FUNCTIONS ---
+        function initAuthObserver() {
+            auth.onAuthStateChanged(user => {
+                const loader = document.getElementById('global-loader');
+                if (user) {
+                    currentUser = user;
+                    // Setup Realtime Listener
+                    setupRealtimeListener(user.uid);
+                } else {
+                    document.getElementById('auth-screen').style.display = 'flex';
+                    document.getElementById('dashboard').classList.add('hidden');
+                    loader.classList.add('opacity-0');
+                    setTimeout(() => loader.style.display = 'none', 500);
+                }
             });
         }
 
-function renderPreview() {
-    document.getElementById('pName').innerText = userData.name || "השם שלך";
-    // הוסף את האלמנט הזה ב-HTML של הטלפון אם הוא לא קיים, או צור אותו דינמית
-let bioEl = document.getElementById('pBio');
-if(!bioEl) {
-    // יוצר את אלמנט הביו אם הוא לא קיים
-    bioEl = document.createElement('p');
-    bioEl.id = 'pBio';
-    bioEl.className = "text-sm text-white/60 text-center px-4 mt-2 mb-4 font-light leading-relaxed";
-    document.getElementById('pName').after(bioEl);
-}
-bioEl.innerText = userData.bio || "כאן יופיע התיאור שלך...";
-    document.getElementById('pImg').src = userData.img || `https://ui-avatars.com/api/?name=${userData.name || 'User'}&background=random`;
-    
-    const container = document.getElementById('pLinks');
-    container.innerHTML = ''; // מנקה הכל לפני רינדור מחדש
-
-    userData.links.forEach((l, i) => {
-        if(!l.t) return;
-        const style = getSocialStyle(l.u || "");
-        const btn = document.createElement('a');
-        btn.href = l.u || "#";
-        btn.target = "_blank";
-        // הוספת עיצוב דינמי לפי התמה
-        const isMinimal = userData.theme === 'theme-minimal';
-        btn.className = `link-anim flex items-center justify-between p-4 rounded-2xl transition-all duration-300 hover:scale-[1.03] shadow-lg ${isMinimal ? 'bg-white text-black' : style.color + ' text-white'}`;
-        btn.style.animationDelay = `${i * 0.1}s`;
-        btn.innerHTML = `<div class="flex items-center gap-3"><i class="${style.icon}"></i><span class="font-bold">${l.t}</span></div><i class="fa-solid fa-chevron-left opacity-30 text-xs"></i>`;
-        btn.onclick = () => trackClick(auth.currentUser.uid, i);
-        container.appendChild(btn);
-    });
-}
-
-        function copyPublicLink() {
-    const url = window.location.href.split('?')[0] + "?u=" + auth.currentUser.uid;
-    navigator.clipboard.writeText(url).then(() => {
-        alert("הקישור הועתק! שלח אותו בוואטסאפ");
-    });
-}
-
-        function updateLink(i, f, v) { userData.links[i][f] = v; autoSave(); }
-        function addNewLink() { userData.links.push({t:'', u:'', clicks:0}); renderEditor(); }
-        function removeLink(i) { userData.links.splice(i, 1); renderEditor(); autoSave(); }
-        
-        function setTheme(t) { 
-            userData.theme = t; 
-            document.getElementById('previewScreen').className = `h-full pt-14 px-6 flex flex-col items-center overflow-y-auto no-scrollbar ${t}`;
-            autoSave(); 
-        }
-
-function autoSave() {
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-        userData.name = document.getElementById('nameIn').value;
-        userData.bio = document.getElementById('bioIn').value; // <--- הוספנו את זה
-        userData.phone = document.getElementById('phoneIn').value;
-        userData.img = document.getElementById('imgIn').value;
-        db.collection("users").doc(auth.currentUser.uid).set(userData).then(renderPreview);
-    }, 500);
-}
-
-        function downloadVCard() {
-            const v = `BEGIN:VCARD\nVERSION:3.0\nFN:${userData.name}\nTEL:${userData.phone}\nEND:VCARD`;
-            const b = new Blob([v], {type:'text/vcard'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(b);
-            a.download = "contact.vcf";
-            a.click();
-        }
-
-        async function authAction(type) {
-    try {
-        if (type === 'google') {
-            await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-        } else {
-            const e = document.getElementById('email').value, p = document.getElementById('pass').value;
-            if(!e || !p) return alert("מלא פרטים");
-            try { await auth.signInWithEmailAndPassword(e, p); } 
-            catch { await auth.createUserWithEmailAndPassword(e, p); }
-        }
-    } catch (err) { alert(err.message); }
-}
-
-async function trackClick(uid, linkIndex) {
-    const userRef = db.collection("users").doc(uid);
-    // זה המנגנון שמוודא שהספירה מדויקת גם אם 100 איש לוחצים בשנייה
-    return db.runTransaction(async (transaction) => {
-        const doc = await transaction.get(userRef);
-        const links = doc.data().links;
-        links[linkIndex].clicks = (links[linkIndex].clicks || 0) + 1;
-        transaction.update(userRef, { links: links });
-    });
-}
-
-        function toggleShareMenu() {
-            const m = document.getElementById('shareModal');
-            m.classList.toggle('hidden');
-            if(!m.classList.contains('hidden')) {
-                const url = window.location.href.split('?')[0] + "?u=" + auth.currentUser.uid;
-                document.getElementById('qrcode').innerHTML = "";
-                new QRCode(document.getElementById("qrcode"), { text: url, width: 120, height: 120 });
+        async function loginWithGoogle() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithPopup(provider);
+            } catch (error) {
+                showToast(`שגיאה בהתחברות: ${error.message}`, 'error');
+                console.error(error);
             }
+        }
+
+        async function loginWithEmail() {
+            const e = document.getElementById('email').value;
+            const p = document.getElementById('pass').value;
+            if(!e || !p) return showToast('נא למלא אימייל וסיסמה', 'error');
+
+            try {
+                await auth.signInWithEmailAndPassword(e, p);
+            } catch (err) {
+                if(err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                    // Try Register
+                    try {
+                        await auth.createUserWithEmailAndPassword(e, p);
+                        showToast('חשבון חדש נוצר בהצלחה!', 'success');
+                    } catch (regErr) {
+                        showToast(regErr.message, 'error');
+                    }
+                } else {
+                    showToast(err.message, 'error');
+                }
+            }
+        }
+
+        function logout() {
+            auth.signOut();
+            window.location.reload();
+        }
+
+        // --- DATA LOGIC (Realtime) ---
+        function setupRealtimeListener(uid) {
+            const loader = document.getElementById('global-loader');
+            
+            db.collection("users").doc(uid).onSnapshot(doc => {
+                loader.classList.add('opacity-0');
+                setTimeout(() => loader.style.display = 'none', 500);
+
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('dashboard').classList.remove('hidden');
+
+                if (doc.exists) {
+                    userData = doc.data();
+                    // Merge defaults just in case
+                    if(!userData.links) userData.links = [];
+                    if(!userData.theme) userData.theme = 'theme-midnight';
+                    
+                    updateUI();
+                } else {
+                    // Create default doc
+                    userData = {
+                        name: currentUser.displayName || "User",
+                        img: currentUser.photoURL || "",
+                        bio: "הביו החדש שלי ✨",
+                        theme: "theme-midnight",
+                        links: [{ t: "הלינק הראשון שלי", u: "https://instagram.com", clicks: 0 }]
+                    };
+                    db.collection("users").doc(uid).set(userData);
+                }
+            }, err => {
+                showToast("שגיאה בטעינת נתונים", 'error');
+                console.error(err);
+            });
+        }
+
+        async function loadPublicProfile(uid) {
+            const loader = document.getElementById('global-loader');
+            try {
+                const doc = await db.collection("users").doc(uid).get();
+                loader.style.display = 'none';
+
+                if (doc.exists) {
+                    userData = doc.data();
+                    const view = document.getElementById('public-view');
+                    view.classList.remove('hidden');
+                    renderProfile(view, true); // true = isPublic
+                    document.title = `${userData.name} | BioPro`;
+                } else {
+                    document.body.innerHTML = `<div class="flex h-screen items-center justify-center text-white">המשתמש לא נמצא 🔍</div>`;
+                }
+            } catch (err) {
+                console.error(err);
+                loader.style.display = 'none';
+            }
+        }
+
+        // --- UI RENDERING ---
+        function updateUI() {
+            // Update Editor Inputs
+            const nameInput = document.getElementById('nameIn');
+            const bioInput = document.getElementById('bioIn');
+            
+            // Only update value if not currently focused (to prevent cursor jumping)
+            if (document.activeElement !== nameInput) nameInput.value = userData.name || "";
+            if (document.activeElement !== bioInput) bioInput.value = userData.bio || "";
+            
+            document.getElementById('editor-avatar').src = userData.img || `https://ui-avatars.com/api/?name=${userData.name || 'User'}&background=random`;
+            
+            // Calc total clicks
+            const total = userData.links.reduce((acc, curr) => acc + (curr.clicks || 0), 0);
+            document.getElementById('total-clicks').innerText = total;
+
+            // Render Links Editor
+            renderEditorLinks();
+            
+            // Render Preview
+            renderProfile(document.getElementById('preview-container'), false);
+        }
+
+        function renderEditorLinks() {
+            const container = document.getElementById('links-editor-container');
+            container.innerHTML = '';
+            
+            userData.links.forEach((link, i) => {
+                const el = document.createElement('div');
+                el.className = 'glass p-3 rounded-xl flex gap-3 items-center animate-pop';
+                el.style.animationDelay = `${i * 50}ms`;
+                el.innerHTML = `
+                    <div class="flex flex-col gap-1 text-slate-500">
+                        <button onclick="moveLink(${i}, -1)" class="hover:text-white"><i class="fa-solid fa-chevron-up text-xs"></i></button>
+                        <button onclick="moveLink(${i}, 1)" class="hover:text-white"><i class="fa-solid fa-chevron-down text-xs"></i></button>
+                    </div>
+                    <div class="flex-1 space-y-2">
+                        <div class="flex items-center gap-2 bg-black/20 rounded-lg px-2">
+                            <i class="${getIcon(link.u)} text-slate-400 text-xs"></i>
+                            <input value="${escapeHtml(link.t)}" oninput="updateLinkData(${i}, 't', this.value)" class="bg-transparent w-full py-1 text-sm font-bold outline-none border-none" placeholder="כותרת">
+                        </div>
+                        <input value="${escapeHtml(link.u)}" oninput="updateLinkData(${i}, 'u', this.value)" class="bg-transparent w-full text-xs text-indigo-300 outline-none px-2 font-mono" placeholder="https://...">
+                    </div>
+                    <div class="text-center px-2">
+                        <div class="text-[10px] opacity-50">קליקים</div>
+                        <div class="font-bold text-xs">${link.clicks || 0}</div>
+                    </div>
+                    <button onclick="deleteLink(${i})" class="w-8 h-8 rounded-lg hover:bg-red-500/20 hover:text-red-400 transition text-slate-600"><i class="fa-solid fa-trash"></i></button>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function renderProfile(container, isPublic) {
+            // Apply Theme Class
+            container.className = `w-full min-h-full flex flex-col items-center pt-12 px-6 pb-10 overflow-y-auto no-scrollbar ${userData.theme}`;
+            
+            const imgUrl = userData.img || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name)}&background=random`;
+
+            let html = `
+                <div class="text-center w-full max-w-md mb-8 animate-pop">
+                    <img src="${imgUrl}" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-white/10 shadow-2xl">
+                    <h1 class="text-2xl font-black mb-2 tracking-tight">${escapeHtml(userData.name)}</h1>
+                    <p class="text-sm opacity-70 whitespace-pre-wrap leading-relaxed">${escapeHtml(userData.bio)}</p>
+                </div>
+                <div class="w-full max-w-md space-y-3 pb-12">
+            `;
+
+            userData.links.forEach((link, i) => {
+                if(!link.t) return;
+                const iconClass = getIcon(link.u);
+                
+                // OnClick logic
+                const clickAttr = isPublic ? `onclick="trackClick(${i}, '${publicUid}')"` : `onclick="return false;"`;
+                const targetAttr = isPublic ? `target="_blank"` : ``;
+                const cursorClass = isPublic ? `cursor-pointer hover:scale-[1.02] active:scale-95` : `cursor-default opacity-90`;
+
+                html += `
+                    <a href="${link.u}" ${targetAttr} ${clickAttr} 
+                       class="relative flex items-center p-4 rounded-xl transition-all duration-300 shadow-lg ${cursorClass} animate-pop"
+                       style="background: var(--card-bg, rgba(255,255,255,0.1)); animation-delay: ${i * 100}ms">
+                        <div class="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition rounded-xl"></div>
+                        <div class="w-10 h-10 rounded-full bg-black/10 flex items-center justify-center text-lg z-10">
+                            <i class="${iconClass}"></i>
+                        </div>
+                        <div class="flex-1 text-center font-bold z-10">${escapeHtml(link.t)}</div>
+                        <div class="w-10 flex justify-end opacity-50 z-10"><i class="fa-solid fa-arrow-left"></i></div>
+                    </a>
+                `;
+            });
+
+            html += `</div>`;
+            
+            if(isPublic) {
+                html += `
+                    <footer class="mt-auto py-6 opacity-40 text-[10px] font-bold tracking-[0.2em] uppercase">
+                        BioPro Cloud
+                    </footer>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // --- ACTIONS ---
+
+        function addLink() {
+            userData.links.push({ t: "", u: "", clicks: 0 });
+            debouncedSave();
+        }
+
+        function deleteLink(index) {
+            if(confirm("למחוק?")) {
+                userData.links.splice(index, 1);
+                debouncedSave();
+            }
+        }
+
+        function moveLink(index, direction) {
+            if (direction === -1 && index > 0) {
+                [userData.links[index], userData.links[index - 1]] = [userData.links[index - 1], userData.links[index]];
+            } else if (direction === 1 && index < userData.links.length - 1) {
+                [userData.links[index], userData.links[index + 1]] = [userData.links[index + 1], userData.links[index]];
+            }
+            debouncedSave();
+        }
+
+        function updateLinkData(index, field, val) {
+            userData.links[index][field] = val;
+            // Update preview locally immediately for smoothness
+            renderProfile(document.getElementById('preview-container'), false);
+            debouncedSave();
+        }
+
+        function changeTheme(themeName) {
+            userData.theme = themeName;
+            debouncedSave();
+        }
+
+        function handleImageUpload(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Limit size to 500KB for Firestore optimization
+                if(file.size > 500000) {
+                    return showToast("התמונה גדולה מדי (מקסימום 500KB)", "error");
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    userData.img = e.target.result; // Base64 string
+                    debouncedSave();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function debouncedSave() {
+            // Grab global inputs
+            if(document.getElementById('nameIn')) userData.name = document.getElementById('nameIn').value;
+            if(document.getElementById('bioIn')) userData.bio = document.getElementById('bioIn').value;
+            
+            // Local update
+            updateUI();
+
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => {
+                if(currentUser) {
+                    db.collection("users").doc(currentUser.uid).set(userData, { merge: true })
+                    .then(() => {
+                        // Optional: Small indicator that save worked
+                    })
+                    .catch(err => showToast("שגיאה בשמירה", "error"));
+                }
+            }, 800);
+        }
+
+        // --- PUBLIC ACTIONS ---
+
+        async function trackClick(index, uid) {
+            // Optimistic update handled by link click usually, but here we update DB
+            const userRef = db.collection("users").doc(uid);
+            // Use increment for atomic update
+            /* Note: We can't easily update array element atomically without reading. 
+               For this demo, we use a simple transaction. */
+            try {
+                await db.runTransaction(async (t) => {
+                    const doc = await t.get(userRef);
+                    const data = doc.data();
+                    if(data.links[index]) {
+                        data.links[index].clicks = (data.links[index].clicks || 0) + 1;
+                        t.update(userRef, { links: data.links });
+                    }
+                });
+            } catch(e) { console.log("Click track error", e); }
+        }
+
+        function shareProfile() {
+            const url = `${window.location.origin}${window.location.pathname}?u=${currentUser.uid}`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'BioPro של ' + userData.name,
+                    url: url
+                });
+            } else {
+                navigator.clipboard.writeText(url);
+                showToast("הקישור הועתק ללוח!", "success");
+            }
+        }
+
+        // --- HELPERS ---
+        
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text.replace(/[&<>"']/g, function(m) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+            });
+        }
+
+        function getIcon(url) {
+            if (!url) return "fa-solid fa-link";
+            const l = url.toLowerCase();
+            if (l.includes('instagram')) return "fa-brands fa-instagram";
+            if (l.includes('facebook')) return "fa-brands fa-facebook";
+            if (l.includes('twitter') || l.includes('x.com')) return "fa-brands fa-x-twitter";
+            if (l.includes('tiktok')) return "fa-brands fa-tiktok";
+            if (l.includes('youtube')) return "fa-brands fa-youtube";
+            if (l.includes('whatsapp') || l.includes('wa.me')) return "fa-brands fa-whatsapp";
+            if (l.includes('linkedin')) return "fa-brands fa-linkedin";
+            if (l.includes('github')) return "fa-brands fa-github";
+            if (l.includes('spotify')) return "fa-brands fa-spotify";
+            if (l.includes('waze')) return "fa-brands fa-waze";
+            if (l.includes('mailto')) return "fa-solid fa-envelope";
+            if (l.includes('tel')) return "fa-solid fa-phone";
+            return "fa-solid fa-link";
+        }
+
+        function showToast(msg, type = 'normal') {
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            
+            let colors = "bg-slate-800 border-slate-700 text-white";
+            let icon = "fa-info-circle";
+            
+            if (type === 'success') { colors = "bg-emerald-900/90 border-emerald-500/50 text-emerald-100"; icon = "fa-check-circle"; }
+            if (type === 'error') { colors = "bg-red-900/90 border-red-500/50 text-red-100"; icon = "fa-exclamation-circle"; }
+
+            el.className = `flex items-center gap-3 p-4 rounded-xl border backdrop-blur-md shadow-2xl animate-pop ${colors}`;
+            el.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="text-sm font-bold">${msg}</span>`;
+            
+            container.appendChild(el);
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(-20px)';
+                setTimeout(() => el.remove(), 300);
+            }, 3000);
         }
     </script>
 </body>
